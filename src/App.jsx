@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import Login from './Login.jsx';
 import {
   PieChart,
   Pie,
@@ -1076,6 +1077,9 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
 
 // ─── MAIN APP ───────────────────────────────────────────────────────
 export default function App() {
+  const [authed, setAuthed] = useState(false);
+  if (!authed) return <Login onSuccess={() => setAuthed(true)} />;
+
   const TABS = ['Revenue Impact', 'Win Rate', 'Attachment Rate', 'POV Analysis', 'Technical Fit', 'Loss Analysis'];
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [data, setData] = useState([]);
