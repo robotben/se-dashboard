@@ -443,16 +443,15 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
 };
 
 const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
-  const [product, setProduct] = useState('Vimeo Enterprise');
   const sharedCardStyle = { backgroundColor: '#151a20', borderTop: '1px solid rgba(23, 213, 255, 0.35)', borderRight: '1px solid rgba(23, 213, 255, 0.35)', borderBottom: '1px solid rgba(23, 213, 255, 0.35)', borderLeft: '1px solid rgba(23, 213, 255, 0.35)', borderRadius: '12px', padding: '20px' };
 
   const winStats = useMemo(() => {
-    if (!hasGlobalData) return { 
-      kpis: WIN_RATE_KPIS[product], 
-      diffData: DIFFERENTIAL_DATA[product].map((d, i) => ({ ...d, nbTrend: d.nbDiff, expTrend: d.expDiff })),
-      keywords: KEYWORD_DATA, 
+    if (!hasGlobalData) return {
+      kpis: WIN_RATE_KPIS['Vimeo Enterprise'],
+      diffData: DIFFERENTIAL_DATA['Vimeo Enterprise'].map((d, i) => ({ ...d, nbTrend: d.nbDiff, expTrend: d.expDiff })),
+      keywords: KEYWORD_DATA,
       heatmap: HEATMAP_DATA,
-      stages: SE_STAGE_DATA[product].stages
+      stages: SE_STAGE_DATA['Vimeo Enterprise'].stages
     };
 
     let seNbW = 0, seNbT = 0, noNbW = 0, noNbT = 0, seExW = 0, seExT = 0, noExW = 0, noExT = 0;
@@ -460,7 +459,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
     const buckets = Array.from({length: 13}, (_, i) => ({ bucket: i===12?'$130k+':`$${10+i*10}k–${20+i*10}k`, min: 10000+i*10000, max: i===12?Infinity:20000+i*10000, seNbW: 0, seNbT: 0, noNbW: 0, noNbT: 0, seExW: 0, seExT: 0, noExW: 0, noExT: 0 }));
 
     data.forEach(d => {
-      if (d.product !== product || (d.stage !== 'Closed Won' && d.stage !== 'Closed Lost')) return;
+      if (d.stage !== 'Closed Won' && d.stage !== 'Closed Lost') return;
       const isWon = d.stage === 'Closed Won', isSE = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes', isNb = d.type === "New Business";
       
       // KPIs & Differential
@@ -520,9 +519,9 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
       diffData: diffData.map((d, i) => ({ ...d, nbTrend: Number((nbReg.slope * i + nbReg.intercept).toFixed(1)), expTrend: Number((exReg.slope * i + exReg.intercept).toFixed(1)) })),
       keywords: finalKw.length > 0 ? finalKw : (hasGlobalData ? [] : KEYWORD_DATA),
       heatmap: finalHeat.length > 0 ? finalHeat : (hasGlobalData ? [] : HEATMAP_DATA),
-      stages: finalStages.length > 0 ? finalStages : (hasGlobalData ? [] : SE_STAGE_DATA[product].stages)
+      stages: finalStages.length > 0 ? finalStages : (hasGlobalData ? [] : SE_STAGE_DATA['Vimeo Enterprise'].stages)
     };
-  }, [data, product, hasGlobalData]);
+  }, [data, hasGlobalData]);
 
   const maxHeat = useMemo(() => {
     let m = -1, a = ''; 
@@ -536,16 +535,13 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '8px', background: 'rgba(23, 213, 255, 0.04)', padding: '4px', borderRadius: '99px', width: 'fit-content' }}>
-          {['Vimeo Enterprise', 'OTT'].map(p => <button key={p} onClick={() => setProduct(p)} style={{ background: product === p ? '#17D5FF' : 'transparent', color: product === p ? '#141A20' : '#C8D6E5', fontWeight: product === p ? 700 : 500, border: 'none', padding: '6px 16px', borderRadius: '99px', fontSize: '13px', cursor: 'pointer' }}>{p}</button>)}
+      {hasGlobalData && (dateRange.start || dateRange.end) && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <span style={{ fontSize: '11px', color: COLORS.green, backgroundColor: 'rgba(154, 232, 94, 0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+            Active Date Filter Applied
+          </span>
         </div>
-        {hasGlobalData && (dateRange.start || dateRange.end) && (
-           <span style={{ fontSize: '11px', color: COLORS.green, backgroundColor: 'rgba(154, 232, 94, 0.1)', padding: '4px 8px', borderRadius: '4px' }}>
-             Active Date Filter Applied
-           </span>
-        )}
-      </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
         <Card id="win-se" style={{ position: 'relative' }}><SectionLabel>SE WIN RATE</SectionLabel><div style={{ fontSize: '28px', fontWeight: 700, color: COLORS.blue }}>{winStats.kpis.overall.se}%</div></Card>
