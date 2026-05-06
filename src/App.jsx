@@ -1082,6 +1082,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [loadedRows, setLoadedRows] = useState(0);
   const [dateRange, setDateRange] = useState({ start: '2025-01-01', end: '2025-12-31' });
+  const [productFilter, setProductFilter] = useState('All');
 
   const getFuzzyCol = (row, searchTerms) => {
     const keys = Object.keys(row);
@@ -1164,7 +1165,11 @@ export default function App() {
     return data.filter(d => (!start || (d.date && d.date >= start)) && (!end || (d.date && d.date <= end)));
   }, [data, dateRange]);
 
-  const baseFilteredData = useMemo(() => dateFilteredData.filter(d => d.stage === "Closed Won"), [dateFilteredData]);
+  const productFilteredData = useMemo(() =>
+    productFilter === 'All' ? dateFilteredData : dateFilteredData.filter(d => d.product === productFilter),
+  [dateFilteredData, productFilter]);
+
+  const baseFilteredData = useMemo(() => productFilteredData.filter(d => d.stage === "Closed Won"), [productFilteredData]);
   const seFilteredData = useMemo(() => baseFilteredData.filter(d => d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes'), [baseFilteredData]);
 
   const revKpis = useMemo(() => {
@@ -1249,7 +1254,7 @@ export default function App() {
 
     const bands = { micro: { bv: 0, ses: new Set() }, small: { bv: 0, ses: new Set() }, mid: { bv: 0, ses: new Set() }, large: { bv: 0, ses: new Set() }, ent: { bv: 0, ses: new Set() } };
     
-    dateFilteredData.forEach(d => {
+    productFilteredData.forEach(d => {
       if (d.product !== 'Vimeo Enterprise' || d.stage !== 'Closed Won') return;
       const isSE = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
       if (isSE && d.se && d.se !== "Unknown") {
@@ -1267,7 +1272,7 @@ export default function App() {
       { segment: 'Large $50K–$100K', avgRev: bands.large.ses.size > 0 ? Math.round(bands.large.bv / bands.large.ses.size) : 0 },
       { segment: 'Enterprise $100K+', avgRev: bands.ent.ses.size > 0 ? Math.round(bands.ent.bv / bands.ent.ses.size) : 0 }
     ];
-  }, [dateFilteredData, data.length]);
+  }, [productFilteredData, data.length]);
 
   return (
     <div style={{ fontFamily: 'Inter Tight, sans-serif', backgroundColor: COLORS.bg, color: COLORS.text, minHeight: '100vh', paddingBottom: '60px' }}>
@@ -1280,10 +1285,17 @@ export default function App() {
             </label>
             {loadedRows > 0 && <div style={{ fontSize: '12px', color: COLORS.green }}>{loadedRows.toLocaleString()} rows loaded</div>}
           </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input type="date" value={dateRange.start} onChange={e => setDateRange(p => ({ ...p, start: e.target.value }))} style={{ background: COLORS.card, borderTop: `1px solid ${COLORS.border}`, borderRight: `1px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}`, borderLeft: `1px solid ${COLORS.border}`, color: '#fff', padding: '4px 8px', borderRadius: '4px' }} />
-            <span>to</span>
-            <input type="date" value={dateRange.end} onChange={e => setDateRange(p => ({ ...p, end: e.target.value }))} style={{ background: COLORS.card, borderTop: `1px solid ${COLORS.border}`, borderRight: `1px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}`, borderLeft: `1px solid ${COLORS.border}`, color: '#fff', padding: '4px 8px', borderRadius: '4px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input type="date" value={dateRange.start} onChange={e => setDateRange(p => ({ ...p, start: e.target.value }))} style={{ background: COLORS.card, borderTop: `1px solid ${COLORS.border}`, borderRight: `1px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}`, borderLeft: `1px solid ${COLORS.border}`, color: '#fff', padding: '4px 8px', borderRadius: '4px' }} />
+              <span>to</span>
+              <input type="date" value={dateRange.end} onChange={e => setDateRange(p => ({ ...p, end: e.target.value }))} style={{ background: COLORS.card, borderTop: `1px solid ${COLORS.border}`, borderRight: `1px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}`, borderLeft: `1px solid ${COLORS.border}`, color: '#fff', padding: '4px 8px', borderRadius: '4px' }} />
+            </div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              {['All', 'Vimeo Enterprise', 'OTT', 'Vimeo Custom'].map(p => (
+                <button key={p} onClick={() => setProductFilter(p)} style={{ background: productFilter === p ? COLORS.blue : 'transparent', color: productFilter === p ? COLORS.bg : COLORS.textDim, border: `1px solid ${productFilter === p ? COLORS.blue : COLORS.border}`, borderRadius: '4px', padding: '3px 10px', fontSize: '11px', fontWeight: productFilter === p ? 700 : 500, cursor: 'pointer', fontFamily: 'inherit' }}>{p}</button>
+              ))}
+            </div>
           </div>
         </div>
         <div style={{ padding: '0 32px 16px 32px', color: COLORS.blue, fontSize: '20px', fontWeight: 600 }}>Solutions Engineering</div>
@@ -1293,11 +1305,11 @@ export default function App() {
       </div>
 
       <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
-        {activeTab === 'Win Rate' ? <WinRateTab data={dateFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
-         activeTab === 'Attachment Rate' ? <AttachmentRateDashboard data={dateFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
-         activeTab === 'POV Analysis' ? <PovImpactTab data={dateFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
-         activeTab === 'Technical Fit' ? <TechnicalFitTab data={dateFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
-         activeTab === 'Loss Analysis' ? <LossAnalysisTab data={dateFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+        {activeTab === 'Win Rate' ? <WinRateTab data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+         activeTab === 'Attachment Rate' ? <AttachmentRateDashboard data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+         activeTab === 'POV Analysis' ? <PovImpactTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+         activeTab === 'Technical Fit' ? <TechnicalFitTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+         activeTab === 'Loss Analysis' ? <LossAnalysisTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'Revenue Impact' && data.length === 0 ? (
           <div style={{ borderTop: `2px dashed ${COLORS.borderMuted}`, borderRight: `2px dashed ${COLORS.borderMuted}`, borderBottom: `2px dashed ${COLORS.borderMuted}`, borderLeft: `2px dashed ${COLORS.borderMuted}`, borderRadius: '12px', padding: '64px', textAlign: 'center', marginTop: '64px', color: COLORS.textMuted }}>
             <h2 style={{ margin: '0 0 8px 0', color: COLORS.text }}>No Data Loaded</h2>
