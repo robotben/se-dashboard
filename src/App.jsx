@@ -73,12 +73,15 @@ const STOP_WORDS = new Set([
   "question", "questions", "answer", "answers", "info", "information", "details", "detail", "data", "fact", "facts", "number", "numbers", "figure", "figures", "amount", "amounts",
   "price", "pricing", "cost", "costs", "fee", "fees", "budget", "money", "cash", "pay", "payment", "payed", "paid", "buy", "buying", "bought", "sell", "selling", "sold", "purchase",
   "purchasing", "purchased", "order", "orders", "ordered", "contract", "contracts", "agreement", "agreements", "sign", "signing", "signed", "close", "closing", "closed", "won", "lost",
-  "fit", "content", "tech", "team", "teams", "technical", "technology"
+  "fit", "content", "tech", "team", "teams", "technical", "technology",
+  "http", "https", "www", "com", "org", "net", "io", "html", "htm", "co", "uk", "us",
+  "ott", "sfdc", "salesforce", "hubspot", "zoom", "microsoft", "google", "adobe", "slack"
 ]);
 
 const extractKeywords = (text) => {
   if (!text) return [];
-  const words = text.toLowerCase().split(/[^a-z0-9]+/);
+  const cleaned = text.replace(/https?:\/\/\S+/gi, ' ').replace(/www\.\S+/gi, ' ');
+  const words = cleaned.toLowerCase().split(/[^a-z0-9]+/);
   const uppercaseAcronyms = new Set(['api', 'sso', 'ui', 'ux', 'qa', 'bi', 'db', 'ai', 'ip', 'it', 'tv', 'drm']);
   
   // Filter and format unigrams
@@ -473,15 +476,14 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
       // Keywords & Heatmap & Stages (SE only)
       if (isSE) {
         if (d.keywords) {
-          const ks = extractKeywords(d.keywords);
-          ks.forEach(k => { 
+          const ks = new Set(extractKeywords(d.keywords));
+          ks.forEach(k => {
             const term = k === 'Case' ? 'Use Case' : k;
-            if (!kwMap[term]) kwMap[term] = { count: 0, midW: 0, midT: 0, lrgW: 0, lrgT: 0, entW: 0, entT: 0 };
-            kwMap[term].count++; 
-            
-            if (d.value < 50000) { kwMap[term].midT++; if (isWon) kwMap[term].midW++; }
-            else if (d.value < 100000) { kwMap[term].lrgT++; if (isWon) kwMap[term].lrgW++; }
-            else { kwMap[term].entT++; if (isWon) kwMap[term].entW++; }
+            if (!kwMap[term]) kwMap[term] = { deals: new Set(), midD: new Set(), midWon: new Set(), lrgD: new Set(), lrgWon: new Set(), entD: new Set(), entWon: new Set() };
+            kwMap[term].deals.add(d);
+            if (d.value < 50000) { kwMap[term].midD.add(d); if (isWon) kwMap[term].midWon.add(d); }
+            else if (d.value < 100000) { kwMap[term].lrgD.add(d); if (isWon) kwMap[term].lrgWon.add(d); }
+            else { kwMap[term].entD.add(d); if (isWon) kwMap[term].entWon.add(d); }
           });
         }
         if (['Discovery', 'Business Alignment', 'Technical Proof', 'Pricing and Negotiation', 'Pricing and negotiation'].includes(d.stageWhenSEAssigned)) {
@@ -501,14 +503,17 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
     const exReg = linearRegression(diffData.map((d, i) => ({ x: i, y: d.expDiff })).filter(p => p.y !== null));
 
     const processTerms = new Set(['demo', 'trial', 'pov', 'migration', 'competitive', 'workflow']);
-    const sortedKwEntries = Object.entries(kwMap).sort((a,b) => b[1].count - a[1].count).slice(0, 8);
-    
-    const finalKw = sortedKwEntries.map(([term, data]) => ({ 
-      term, count: data.count, category: processTerms.has(term.toLowerCase()) ? 'process' : 'technical' 
+    const sortedKwEntries = Object.entries(kwMap).sort((a, b) => b[1].deals.size - a[1].deals.size).slice(0, 8);
+
+    const finalKw = sortedKwEntries.map(([term, c]) => ({
+      term, count: c.deals.size, category: processTerms.has(term.toLowerCase()) ? 'process' : 'technical'
     }));
-    
-    const finalHeat = sortedKwEntries.map(([act, c]) => ({ 
-      activity: act, mid: c.midT>0?Math.round(c.midW/c.midT*100):null, large: c.lrgT>0?Math.round(c.lrgW/c.lrgT*100):null, enterprise: c.entT>0?Math.round(c.entW/c.entT*100):null 
+
+    const finalHeat = sortedKwEntries.map(([act, c]) => ({
+      activity: act,
+      mid: c.midD.size > 0 ? Math.round(c.midWon.size / c.midD.size * 100) : null,
+      large: c.lrgD.size > 0 ? Math.round(c.lrgWon.size / c.lrgD.size * 100) : null,
+      enterprise: c.entD.size > 0 ? Math.round(c.entWon.size / c.entD.size * 100) : null,
     }));
     
     const STAGE_ORDER = ['Pricing and Negotiation', 'Technical Proof', 'Business Alignment', 'Discovery'];
