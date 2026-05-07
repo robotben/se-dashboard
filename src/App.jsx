@@ -1106,15 +1106,18 @@ const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
       ],
     };
 
-    // Pass 1: find accounts that had an SE-attached New Business close
-    const seAccounts = new Set();
+    // Pass 1: for each account, store the earliest SE-attached New Business close date
+    const seNBDates = new Map();
     data.forEach(d => {
-      if (d.stage !== 'Closed Won' || d.type !== 'New Business' || !d.account) return;
+      if (d.stage !== 'Closed Won' || d.type !== 'New Business' || !d.account || !d.date) return;
       const isSE = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
-      if (isSE) seAccounts.add(d.account);
+      if (isSE) {
+        const existing = seNBDates.get(d.account);
+        if (!existing || d.date < existing) seNBDates.set(d.account, d.date);
+      }
     });
 
-    // Pass 2: compute LTV — renewals from SE-touched accounts count as SE
+    // Pass 2: compute LTV — Renewal deals from SE-touched accounts (NB closed before renewal) count as SE
     let seSum = 0, seN = 0, noSeSum = 0, noSeN = 0;
     let seMultSum = 0, seMultN = 0, noSeMultSum = 0, noSeMultN = 0;
     const bands = [
@@ -1128,7 +1131,8 @@ const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
     data.forEach(d => {
       if (d.stage !== 'Closed Won' || !d.ltv || d.ltv <= 0) return;
       const isSEDirect = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
-      const isSE = isSEDirect || (d.account && seAccounts.has(d.account));
+      const nbDate = d.account ? seNBDates.get(d.account) : null;
+      const isSE = isSEDirect || (d.type === 'Renewal' && nbDate && d.date && d.date > nbDate);
       if (isSE) {
         seSum += d.ltv; seN++;
         if (d.value > 0) { seMultSum += d.ltv / d.value; seMultN++; }
