@@ -1549,7 +1549,7 @@ export default function App() {
           seActivity: row.se_activity || '',
           technicalFit: row.technical_fit || '',
           lossReason: row.loss_reason || '',
-          age: row.age || 0,
+          age: Math.round(parseFloat(row.age) || 0),
           ltv: parseFloat(row.ltv) || 0,
           hasPOV: !!row.pov_start_date,
         };
