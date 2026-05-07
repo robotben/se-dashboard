@@ -1441,6 +1441,9 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
   );
 };
 
+const SUPABASE_URL = 'https://mbvytwmvutodsnptuxjr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_g-iVPJI-sIqGj9Ny2qcoMg_q4gzBzOe';
+
 // ─── MAIN APP ───────────────────────────────────────────────────────
 export default function App() {
   const TABS = ['Revenue Impact', 'NRR Impact', 'Win Rate', 'Attachment Rate', 'POV Analysis', 'Technical Fit', 'Loss Analysis'];
@@ -1504,6 +1507,59 @@ export default function App() {
       setData(parsedData); setLoadedRows(parsedData.length); setLoading(false);
     };
     reader.readAsText(file, 'iso-8859-1');
+  }, []);
+
+  const loadFromSupabase = useCallback(async () => {
+    setLoading(true);
+    try {
+      let allRows = [];
+      let from = 0;
+      const PAGE = 1000;
+      while (true) {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/opportunities?select=*&limit=${PAGE}&offset=${from}`,
+          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (!res.ok) throw new Error(`Supabase error ${res.status}: ${await res.text()}`);
+        const rows = await res.json();
+        if (!rows.length) break;
+        allRows = allRows.concat(rows);
+        if (rows.length < PAGE) break;
+        from += PAGE;
+      }
+      const parsedData = allRows.map(row => {
+        const closeDate = row.close_date ? new Date(row.close_date) : null;
+        return {
+          date: closeDate,
+          monthKey: closeDate && !isNaN(closeDate) ? `${closeDate.getFullYear()}-${String(closeDate.getMonth() + 1).padStart(2, '0')}` : "",
+          monthLabel: closeDate && !isNaN(closeDate) ? `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][closeDate.getMonth()]} ${closeDate.getFullYear()}` : "",
+          value: parseFloat(row.bookings_value) || 0,
+          type: row.type || '',
+          product: row.product_type || '',
+          stage: row.stage || '',
+          account: (row.account_name || row.account_id || '').toLowerCase().trim(),
+          accountId: (row.account_id || '').trim(),
+          churnDate: row.churn_date || '',
+          hasSE: row.has_se || '',
+          ae: row.ae || '',
+          se: row.se || '',
+          region: row.region || '',
+          stageWhenSEAssigned: row.stage_when_se_assigned || '',
+          keywords: row.keywords || '',
+          seActivity: row.se_activity || '',
+          technicalFit: row.technical_fit || '',
+          lossReason: row.loss_reason || '',
+          age: row.age || 0,
+          ltv: parseFloat(row.ltv) || 0,
+          hasPOV: !!row.pov_start_date,
+        };
+      });
+      setData(parsedData);
+      setLoadedRows(parsedData.length);
+    } catch (err) {
+      alert('Failed to load from Supabase: ' + err.message);
+    }
+    setLoading(false);
   }, []);
 
   const handleExport = useCallback(async (nodeId, filename, action) => {
@@ -1738,6 +1794,9 @@ export default function App() {
               {loading ? 'Parsing...' : 'Upload CSV'}
               <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileUpload} />
             </label>
+            <button onClick={loadFromSupabase} disabled={loading} style={{ cursor: loading ? 'default' : 'pointer', backgroundColor: 'transparent', color: COLORS.blue, padding: '8px 16px', border: `1px solid ${COLORS.blue}`, borderRadius: '6px', fontWeight: 700, fontFamily: 'inherit', opacity: loading ? 0.5 : 1 }}>
+              {loading ? 'Loading...' : 'Load from Supabase'}
+            </button>
             {loadedRows > 0 && <div style={{ fontSize: '12px', color: COLORS.green }}>{loadedRows.toLocaleString()} rows loaded</div>}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
