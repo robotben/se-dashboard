@@ -1089,9 +1089,133 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
   );
 }
 
+// ─── NET RETENTION IMPACT TAB ───────────────────────────────────────
+const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
+  const stats = useMemo(() => {
+    if (!hasGlobalData) return {
+      seAvgLtv: 187500, noSeAvgLtv: 112000, ltvLift: 67.4,
+      seCount: 892, noSeCount: 2140,
+      seTotalLtv: 167250000, noSeTotalLtv: 239680000,
+      seAvgMultiple: 4.8, noSeAvgMultiple: 3.1,
+      bandData: [
+        { band: '$0–$10K',    seLtv:  42000, noSeLtv:  28500, seN:  124, noSeN: 389 },
+        { band: '$10K–$25K',  seLtv:  86000, noSeLtv:  58000, seN:  218, noSeN: 641 },
+        { band: '$25K–$50K',  seLtv: 154000, noSeLtv:  98000, seN:  267, noSeN: 572 },
+        { band: '$50K–$100K', seLtv: 228000, noSeLtv: 144000, seN:  183, noSeN: 344 },
+        { band: '$100K+',     seLtv: 496000, noSeLtv: 318000, seN:  100, noSeN: 194 },
+      ],
+    };
+
+    let seSum = 0, seN = 0, noSeSum = 0, noSeN = 0;
+    let seMultSum = 0, seMultN = 0, noSeMultSum = 0, noSeMultN = 0;
+    const bands = [
+      { label: '$0–$10K',    min: 0,      max: 10000,   seSum: 0, seN: 0, noSeSum: 0, noSeN: 0 },
+      { label: '$10K–$25K',  min: 10000,  max: 25000,   seSum: 0, seN: 0, noSeSum: 0, noSeN: 0 },
+      { label: '$25K–$50K',  min: 25000,  max: 50000,   seSum: 0, seN: 0, noSeSum: 0, noSeN: 0 },
+      { label: '$50K–$100K', min: 50000,  max: 100000,  seSum: 0, seN: 0, noSeSum: 0, noSeN: 0 },
+      { label: '$100K+',     min: 100000, max: Infinity, seSum: 0, seN: 0, noSeSum: 0, noSeN: 0 },
+    ];
+
+    data.forEach(d => {
+      if (d.stage !== 'Closed Won' || !d.ltv || d.ltv <= 0) return;
+      const isSE = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
+      if (isSE) {
+        seSum += d.ltv; seN++;
+        if (d.value > 0) { seMultSum += d.ltv / d.value; seMultN++; }
+      } else {
+        noSeSum += d.ltv; noSeN++;
+        if (d.value > 0) { noSeMultSum += d.ltv / d.value; noSeMultN++; }
+      }
+      const b = bands.find(b => d.value >= b.min && d.value < b.max);
+      if (b) { if (isSE) { b.seSum += d.ltv; b.seN++; } else { b.noSeSum += d.ltv; b.noSeN++; } }
+    });
+
+    const seAvgLtv = seN > 0 ? Math.round(seSum / seN) : 0;
+    const noSeAvgLtv = noSeN > 0 ? Math.round(noSeSum / noSeN) : 0;
+    return {
+      seAvgLtv, noSeAvgLtv,
+      ltvLift: noSeAvgLtv > 0 ? Number(((seAvgLtv - noSeAvgLtv) / noSeAvgLtv * 100).toFixed(1)) : 0,
+      seCount: seN, noSeCount: noSeN,
+      seTotalLtv: seSum, noSeTotalLtv: noSeSum,
+      seAvgMultiple: seMultN > 0 ? Number((seMultSum / seMultN).toFixed(1)) : 0,
+      noSeAvgMultiple: noSeMultN > 0 ? Number((noSeMultSum / noSeMultN).toFixed(1)) : 0,
+      bandData: bands
+        .map(b => ({ band: b.label, seLtv: b.seN > 0 ? Math.round(b.seSum / b.seN) : 0, noSeLtv: b.noSeN > 0 ? Math.round(b.noSeSum / b.noSeN) : 0, seN: b.seN, noSeN: b.noSeN }))
+        .filter(b => b.seN > 0 || b.noSeN > 0),
+    };
+  }, [data, hasGlobalData]);
+
+  const liftColor = stats.ltvLift >= 0 ? COLORS.green : COLORS.red;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+        <Card id="nri-se-ltv" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nri-se-ltv', 'se-avg-ltv.png', 'copy')} onDownload={() => handleExport('nri-se-ltv', 'se-avg-ltv.png', 'download')} />
+          <SectionLabel>SE AVG LTV</SectionLabel>
+          <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.blue }}>{formatCurrency(stats.seAvgLtv)}</div>
+          <div style={{ fontSize: '12px', color: COLORS.textDim, marginTop: '4px' }}>n={stats.seCount.toLocaleString()} deals</div>
+        </Card>
+        <Card id="nri-nose-ltv" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nri-nose-ltv', 'nose-avg-ltv.png', 'copy')} onDownload={() => handleExport('nri-nose-ltv', 'nose-avg-ltv.png', 'download')} />
+          <SectionLabel>NO SE AVG LTV</SectionLabel>
+          <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.textMuted }}>{formatCurrency(stats.noSeAvgLtv)}</div>
+          <div style={{ fontSize: '12px', color: COLORS.textDim, marginTop: '4px' }}>n={stats.noSeCount.toLocaleString()} deals</div>
+        </Card>
+        <Card id="nri-lift" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nri-lift', 'ltv-lift.png', 'copy')} onDownload={() => handleExport('nri-lift', 'ltv-lift.png', 'download')} />
+          <SectionLabel>LTV LIFT</SectionLabel>
+          <div style={{ fontSize: '36px', fontWeight: 700, color: liftColor }}>{stats.ltvLift >= 0 ? '+' : ''}{stats.ltvLift}%</div>
+          <div style={{ fontSize: '12px', color: COLORS.textDim, marginTop: '4px' }}>SE vs No-SE avg LTV</div>
+        </Card>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+        <Card id="nri-se-mult" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nri-se-mult', 'se-multiple.png', 'copy')} onDownload={() => handleExport('nri-se-mult', 'se-multiple.png', 'download')} />
+          <SectionLabel>SE AVG LTV / ACV MULTIPLE</SectionLabel>
+          <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.blue }}>{stats.seAvgMultiple}x</div>
+          <div style={{ fontSize: '12px', color: COLORS.textDim, marginTop: '4px' }}>lifetime value per dollar of initial ACV</div>
+        </Card>
+        <Card id="nri-nose-mult" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nri-nose-mult', 'nose-multiple.png', 'copy')} onDownload={() => handleExport('nri-nose-mult', 'nose-multiple.png', 'download')} />
+          <SectionLabel>NO SE AVG LTV / ACV MULTIPLE</SectionLabel>
+          <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.textMuted }}>{stats.noSeAvgMultiple}x</div>
+          <div style={{ fontSize: '12px', color: COLORS.textDim, marginTop: '4px' }}>lifetime value per dollar of initial ACV</div>
+        </Card>
+      </div>
+
+      <Card id="nri-band-chart" style={{ position: 'relative' }}>
+        <ExportActions onCopy={() => handleExport('nri-band-chart', 'ltv-by-band.png', 'copy')} onDownload={() => handleExport('nri-band-chart', 'ltv-by-band.png', 'download')} />
+        <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>Avg LTV by ACV Band</h2>
+        <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '20px' }}>Closed Won deals with LTV &gt; 0 only</p>
+        {stats.bandData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={stats.bandData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
+              <XAxis dataKey="band" stroke={COLORS.textDim} tick={{ fill: COLORS.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: COLORS.border }} />
+              <YAxis tickFormatter={v => formatCurrency(v)} stroke={COLORS.textDim} tick={{ fill: COLORS.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: COLORS.border, opacity: 0.4 }} />
+              <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: COLORS.textSub }} />
+              <Bar dataKey="seLtv" name="SE Avg LTV" fill={COLORS.blue} radius={[4, 4, 0, 0]}>
+                <LabelList dataKey="seN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: COLORS.textDim, fontSize: 10 }} />
+              </Bar>
+              <Bar dataKey="noSeLtv" name="No SE Avg LTV" fill={COLORS.borderMuted} radius={[4, 4, 0, 0]}>
+                <LabelList dataKey="noSeN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: COLORS.textDim, fontSize: 10 }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div style={{ height: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: COLORS.textDim }}>No LTV data found. Ensure your CSV includes a Lifetime Value (LTV) column.</div>
+        )}
+      </Card>
+    </div>
+  );
+};
+
 // ─── MAIN APP ───────────────────────────────────────────────────────
 export default function App() {
-  const TABS = ['Revenue Impact', 'Win Rate', 'Attachment Rate', 'POV Analysis', 'Technical Fit', 'Loss Analysis'];
+  const TABS = ['Revenue Impact', 'Net Retention Impact', 'Win Rate', 'Attachment Rate', 'POV Analysis', 'Technical Fit', 'Loss Analysis'];
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1138,7 +1262,9 @@ export default function App() {
           seActivity: getFuzzyCol(row, ['se activity', 'primary activity', 'activity type', 'activity']) || row["SE Activity"] || row["Primary Activity"] || row["Activity Type"] || row["Activity"] || "",
           technicalFit: getFuzzyCol(row, ['technical fit', 'fit rating', 'fit score', 'fit']) || row["Technical Fit"] || "",
           lossReason: getFuzzyCol(row, ['reason for lost opportunity', 'loss reason', 'closed lost reason', 'reason for loss', 'reason lost']) || row["Reason for Lost Opportunity"] || row["Loss Reason"] || "",
-          age, hasPOV: (() => {
+          age,
+          ltv: parseFloat(String(getFuzzyCol(row, ['lifetime value', 'ltv']) || row["Lifetime Value (LTV)"] || row["LTV"] || "0").replace(/[^0-9.-]+/g, "")) || 0,
+          hasPOV: (() => {
             const povVal = getFuzzyCol(row, ['pov start', 'trial start', 'pov date', 'pov']) || row["POV Start Date"] || row["Trial Start Date"];
             return !!povVal && String(povVal).toLowerCase() !== 'false' && String(povVal).toLowerCase() !== 'no' && String(povVal).trim() !== '0';
           })()
@@ -1320,7 +1446,8 @@ export default function App() {
       </div>
 
       <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
-        {activeTab === 'Win Rate' ? <WinRateTab data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+        {activeTab === 'Net Retention Impact' ? <NetRetentionTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+         activeTab === 'Win Rate' ? <WinRateTab data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'Attachment Rate' ? <AttachmentRateDashboard data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'POV Analysis' ? <PovImpactTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'Technical Fit' ? <TechnicalFitTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
