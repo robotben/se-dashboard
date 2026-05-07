@@ -166,6 +166,38 @@ const SE_STAGE_DATA = {
   },
 };
 
+const NRR_IMPACT_DATA = {
+  cohorts: {
+    se:   { n: 65,  medianLTV: 18700, meanLTV: 48407, churnRate: 0.0, expansionRate: 3.1 },
+    noSe: { n: 419, medianLTV: 4500,  meanLTV: 9961,  churnRate: 0.7, expansionRate: 1.0 },
+  },
+  ltvBuckets: [
+    { label: '$0',       se: 17, noSe: 98  },
+    { label: '$1–10k',   se: 8,  noSe: 233 },
+    { label: '$10–50k',  se: 25, noSe: 73  },
+    { label: '$50–100k', se: 8,  noSe: 9   },
+    { label: '$100k+',   se: 7,  noSe: 6   },
+  ],
+  regionMedianLTV: [
+    { region: 'AMER Named',       medianLTV: 175000, n: 3  },
+    { region: 'AMER Mid-Market',  medianLTV: 53812,  n: 11 },
+    { region: 'AMER SMB NB',      medianLTV: 33000,  n: 6  },
+    { region: 'AMER Inside Sales',medianLTV: 25000,  n: 3  },
+    { region: 'EMEA',             medianLTV: 19350,  n: 10 },
+    { region: 'LATAM',            medianLTV: 14600,  n: 4  },
+    { region: 'APAC',             medianLTV: 10000,  n: 16 },
+    { region: 'AMER Enterprise',  medianLTV: 0,      n: 12 },
+  ],
+  stageWhenAssigned: [
+    { stage: 'Discovery',             count: 265 },
+    { stage: 'Business Alignment',    count: 129 },
+    { stage: 'Technical Proof',       count: 80  },
+    { stage: 'Contract',              count: 48  },
+    { stage: 'Pricing & Negotiation', count: 43  },
+    { stage: 'Prospect',              count: 43  },
+  ],
+};
+
 // ─── UTILITIES ──────────────────────────────────────────────────────
 function linearRegression(points) {
   const n = points.length;
@@ -1089,6 +1121,168 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
   );
 }
 
+// ─── NRR IMPACT TAB ─────────────────────────────────────────────────
+const NrrCountTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: C.card, border: `1px solid ${C.border}`, padding: '10px 14px', borderRadius: '8px', color: C.text }}>
+      <div style={{ fontWeight: 600, color: C.textMuted, marginBottom: '6px' }}>{label}</div>
+      {payload.map((e, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <div style={{ width: 10, height: 10, background: e.color, borderRadius: '2px' }} />
+          <span style={{ color: COLORS.textSub }}>{e.name}:</span>
+          <span style={{ fontWeight: 600 }}>{e.value} accounts</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const NrrImpactTab = ({ nrrData, handleExport }) => {
+  const { cohorts, ltvBuckets, regionMedianLTV, stageWhenAssigned } = nrrData;
+
+  const medianMult = cohorts.noSe.medianLTV > 0
+    ? (cohorts.se.medianLTV / cohorts.noSe.medianLTV).toFixed(1) : '–';
+  const meanMult = cohorts.noSe.meanLTV > 0
+    ? (cohorts.se.meanLTV / cohorts.noSe.meanLTV).toFixed(1) : '–';
+  const expansionMult = cohorts.noSe.expansionRate > 0
+    ? (cohorts.se.expansionRate / cohorts.noSe.expansionRate).toFixed(1) : '–';
+
+  const fmtK = v => v === 0 ? '$0' : v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${v}`;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+      {/* Section 1 — Insight banner */}
+      <Card accentColor={C.accent} id="nrr-banner" style={{ position: 'relative' }}>
+        <ExportActions onCopy={() => handleExport('nrr-banner', 'nrr-banner.png', 'copy')} onDownload={() => handleExport('nrr-banner', 'nrr-banner.png', 'download')} />
+        <div style={{ fontSize: '20px', fontWeight: 800, color: C.text, marginBottom: '8px' }}>
+          SE-attached accounts show <span style={{ color: C.accent }}>{medianMult}× higher median LTV</span>
+        </div>
+        <div style={{ fontSize: '13px', color: C.textMuted, marginBottom: '16px' }}>
+          Based on {cohorts.se.n + cohorts.noSe.n} closed-won new business accounts grouped by Account ID · SE cohort: n={cohorts.se.n} · No-SE cohort: n={cohorts.noSe.n}
+        </div>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ background: hexToRgba(C.accent, 0.1), border: `1px solid ${C.accent}`, borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 700, color: C.accent }}>
+            {expansionMult}× higher expansion rate
+          </div>
+          <div style={{ background: hexToRgba(C.green, 0.1), border: `1px solid ${C.green}`, borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 700, color: C.green }}>
+            {cohorts.se.churnRate.toFixed(1)}% vs {cohorts.noSe.churnRate.toFixed(1)}% churn
+          </div>
+        </div>
+      </Card>
+
+      {/* Section 2 — 6 metric cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px' }}>
+        {[
+          { id: 'nrr-se-median',   label: 'MEDIAN LTV · SE',        val: formatCurrency(cohorts.se.medianLTV),       color: C.accent    },
+          { id: 'nrr-nose-median', label: 'MEDIAN LTV · NO SE',     val: formatCurrency(cohorts.noSe.medianLTV),     color: C.textMuted },
+          { id: 'nrr-median-mult', label: 'MEDIAN LTV MULTIPLE',    val: `${medianMult}×`,                           color: C.green     },
+          { id: 'nrr-mean-mult',   label: 'MEAN LTV MULTIPLE',      val: `${meanMult}×`,                             color: C.green     },
+          { id: 'nrr-se-exp',      label: 'EXPANSION RATE · SE',    val: `${cohorts.se.expansionRate.toFixed(1)}%`,  color: C.accent    },
+          { id: 'nrr-nose-exp',    label: 'EXPANSION RATE · NO SE', val: `${cohorts.noSe.expansionRate.toFixed(1)}%`,color: C.textMuted },
+        ].map(k => (
+          <Card key={k.id} id={k.id} style={{ position: 'relative' }}>
+            <ExportActions onCopy={() => handleExport(k.id, `${k.id}.png`, 'copy')} onDownload={() => handleExport(k.id, `${k.id}.png`, 'download')} />
+            <SectionLabel>{k.label}</SectionLabel>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: k.color, marginTop: '4px' }}>{k.val}</div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Section 3 — LTV Distribution */}
+      <Card id="nrr-ltv-dist" style={{ position: 'relative' }}>
+        <ExportActions onCopy={() => handleExport('nrr-ltv-dist', 'nrr-ltv-dist.png', 'copy')} onDownload={() => handleExport('nrr-ltv-dist', 'nrr-ltv-dist.png', 'download')} />
+        <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>LTV Distribution by Cohort</h2>
+        <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>Account count by LTV band — SE-attached vs No SE</p>
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: C.accent }}>
+            <span style={{ width: 10, height: 10, background: C.accent, borderRadius: '2px', display: 'inline-block' }} />SE-attached
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: C.orange }}>
+            <span style={{ width: 10, height: 10, background: C.orange, borderRadius: '2px', display: 'inline-block' }} />No SE
+          </span>
+        </div>
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={ltvBuckets} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
+            <XAxis dataKey="label" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
+            <YAxis stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
+            <Tooltip content={<NrrCountTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+            <Bar dataKey="se"   name="SE-attached" fill={C.accent} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="noSe" name="No SE"        fill={C.orange} radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* Section 4 — Side-by-side charts */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+
+        {/* Regional Median LTV */}
+        <Card id="nrr-region" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nrr-region', 'nrr-region.png', 'copy')} onDownload={() => handleExport('nrr-region', 'nrr-region.png', 'download')} />
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Regional Median LTV</h2>
+          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts only</p>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={regionMedianLTV} layout="vertical" margin={{ top: 0, right: 50, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
+              <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
+              <YAxis type="category" dataKey="region" width={145} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+              <Bar dataKey="medianLTV" name="Median LTV" fill={C.accent} radius={[0, 4, 4, 0]}>
+                <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <p style={{ fontSize: '11px', color: C.textDim, fontStyle: 'italic', margin: '12px 0 0 0' }}>
+            AMER Enterprise n=12 shows $0 median — likely incomplete LTV data for recent closes
+          </p>
+        </Card>
+
+        {/* Stage when SE assigned */}
+        <Card id="nrr-stage" style={{ position: 'relative' }}>
+          <ExportActions onCopy={() => handleExport('nrr-stage', 'nrr-stage.png', 'copy')} onDownload={() => handleExport('nrr-stage', 'nrr-stage.png', 'download')} />
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Stage When SE Assigned</h2>
+          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts — genesis deal</p>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={stageWhenAssigned} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
+              <XAxis type="number" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
+              <YAxis type="category" dataKey="stage" width={155} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+              <Bar dataKey="count" name="Count" fill={C.accent} radius={[0, 4, 4, 0]}>
+                <LabelList dataKey="count" position="right" style={{ fill: C.textDim, fontSize: 10 }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <p style={{ fontSize: '11px', color: C.textDim, fontStyle: 'italic', margin: '12px 0 0 0' }}>
+            Discovery + Business Alignment = 76% of SE assignments — healthy early coverage
+          </p>
+        </Card>
+      </div>
+
+      {/* Section 5 — Data quality callout */}
+      <Card id="nrr-quality" style={{ position: 'relative' }}>
+        <ExportActions onCopy={() => handleExport('nrr-quality', 'nrr-quality.png', 'copy')} onDownload={() => handleExport('nrr-quality', 'nrr-quality.png', 'download')} />
+        <SectionLabel>DATA QUALITY NOTES</SectionLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+          {[
+            'POC signal sparse (24 records) — directional only, not statistically robust',
+            'Churn date populated on 987 of 14,315 records — survival analysis will strengthen as backfill increases',
+            'AMER Enterprise LTV anomaly ($0 median) worth investigating separately — likely reflects recent closes with LTV not yet recorded',
+          ].map((note, i) => (
+            <div key={i} style={{ display: 'flex', gap: '10px', fontSize: '12px', color: C.textMuted }}>
+              <span style={{ color: C.textDim, flexShrink: 0 }}>·</span>
+              <span>{note}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+    </div>
+  );
+};
+
 // ─── NET RETENTION IMPACT TAB ───────────────────────────────────────
 const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
   const stats = useMemo(() => {
@@ -1229,7 +1423,7 @@ const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
 
 // ─── MAIN APP ───────────────────────────────────────────────────────
 export default function App() {
-  const TABS = ['Revenue Impact', 'Net Retention Impact', 'Win Rate', 'Attachment Rate', 'POV Analysis', 'Technical Fit', 'Loss Analysis'];
+  const TABS = ['Revenue Impact', 'NRR Impact', 'Net Retention Impact', 'Win Rate', 'Attachment Rate', 'POV Analysis', 'Technical Fit', 'Loss Analysis'];
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1269,6 +1463,8 @@ export default function App() {
           value: parseFloat(String(row["Bookings Value"] || row["Amount"] || row["Value"] || "0").replace(/[^0-9.-]+/g, "")) || 0,
           type: row["Type"], product: row["Product Type"], stage: row["Stage"],
           account: (getFuzzyCol(row, ['account name', 'account id', 'account']) || row["Account Name"] || row["Account ID"] || "").toLowerCase().trim(),
+          accountId: (row["Account ID"] || getFuzzyCol(row, ['account id']) || "").trim(),
+          churnDate: (row["Churn Date"] || getFuzzyCol(row, ['churn date', 'churn']) || "").trim(),
           hasSE: getFuzzyCol(row, ['has solutions engineer', 'se attached', 'has se']) || row["Has Solutions Engineer?"],
           ae: row["Account Executive"] || row["Opportunity Owner"] || "", se: row["Solutions Engineer"] || "",
           region: row["Owner Region"] || row["Region"] || "", 
@@ -1327,6 +1523,80 @@ export default function App() {
 
   const baseFilteredData = useMemo(() => productFilteredData.filter(d => d.stage === "Closed Won"), [productFilteredData]);
   const seFilteredData = useMemo(() => baseFilteredData.filter(d => d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes'), [baseFilteredData]);
+
+  const nrrData = useMemo(() => {
+    if (data.length === 0) return NRR_IMPACT_DATA;
+
+    const CLOSED = new Set(['Closed Won', 'Contract']);
+    const isSEVal = d => d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
+
+    // Group all rows by accountId (falls back to account name)
+    const accMap = {};
+    data.forEach(d => {
+      const key = (d.accountId || d.account || '').trim();
+      if (!key) return;
+      if (!accMap[key]) accMap[key] = [];
+      accMap[key].push(d);
+    });
+
+    const seAccs = [], noSeAccs = [];
+
+    Object.values(accMap).forEach(opps => {
+      const nbOpps = opps.filter(d => d.type === 'New Business' && CLOSED.has(d.stage) && d.date);
+      if (!nbOpps.length) return;
+      nbOpps.sort((a, b) => a.date - b.date);
+      const genesis = nbOpps[0];
+
+      const acc = {
+        ltv: genesis.ltv || 0,
+        churned: opps.some(d => d.churnDate && d.churnDate !== ''),
+        hasExpansion: opps.some(d => (d.type === 'Upsell' || d.type === 'Cross-Sell') && CLOSED.has(d.stage)),
+        region: genesis.region || 'Unknown',
+        stageWhenAssigned: genesis.stageWhenSEAssigned || '',
+      };
+      if (isSEVal(genesis)) seAccs.push(acc); else noSeAccs.push(acc);
+    });
+
+    const median = arr => {
+      if (!arr.length) return 0;
+      const s = [...arr].sort((a, b) => a - b);
+      const m = Math.floor(s.length / 2);
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+    };
+    const mean = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+    const pct = (arr, fn) => arr.length ? Number((arr.filter(fn).length / arr.length * 100).toFixed(1)) : 0;
+
+    const seLTVs = seAccs.map(a => a.ltv), noLTVs = noSeAccs.map(a => a.ltv);
+
+    const BKTS = ['$0', '$1–10k', '$10–50k', '$50–100k', '$100k+'];
+    const bktOf = ltv => ltv === 0 ? '$0' : ltv < 10000 ? '$1–10k' : ltv < 50000 ? '$10–50k' : ltv < 100000 ? '$50–100k' : '$100k+';
+    const seBkt = Object.fromEntries(BKTS.map(l => [l, 0]));
+    const noBkt = Object.fromEntries(BKTS.map(l => [l, 0]));
+    seAccs.forEach(a => seBkt[bktOf(a.ltv)]++);
+    noSeAccs.forEach(a => noBkt[bktOf(a.ltv)]++);
+
+    const regionMap = {};
+    seAccs.forEach(a => { if (!regionMap[a.region]) regionMap[a.region] = []; regionMap[a.region].push(a.ltv); });
+    const regionMedianLTV = Object.entries(regionMap)
+      .map(([region, ltvs]) => ({ region, medianLTV: Math.round(median(ltvs)), n: ltvs.length }))
+      .sort((a, b) => b.medianLTV - a.medianLTV);
+
+    const stageMap = {};
+    seAccs.forEach(a => { if (a.stageWhenAssigned) stageMap[a.stageWhenAssigned] = (stageMap[a.stageWhenAssigned] || 0) + 1; });
+    const stageWhenAssigned = Object.entries(stageMap)
+      .map(([stage, count]) => ({ stage, count }))
+      .sort((a, b) => b.count - a.count);
+
+    return {
+      cohorts: {
+        se:   { n: seAccs.length, medianLTV: Math.round(median(seLTVs)), meanLTV: Math.round(mean(seLTVs)), churnRate: pct(seAccs, a => a.churned),   expansionRate: pct(seAccs, a => a.hasExpansion)   },
+        noSe: { n: noSeAccs.length, medianLTV: Math.round(median(noLTVs)), meanLTV: Math.round(mean(noLTVs)), churnRate: pct(noSeAccs, a => a.churned), expansionRate: pct(noSeAccs, a => a.hasExpansion) },
+      },
+      ltvBuckets: BKTS.map(l => ({ label: l, se: seBkt[l], noSe: noBkt[l] })),
+      regionMedianLTV,
+      stageWhenAssigned,
+    };
+  }, [data]);
 
   const revKpis = useMemo(() => {
     let nb = 0, upsell = 0, crossSell = 0, total = 0, deals = 0, nbDeals = 0;
@@ -1461,7 +1731,8 @@ export default function App() {
       </div>
 
       <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
-        {activeTab === 'Net Retention Impact' ? <NetRetentionTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
+        {activeTab === 'NRR Impact' ? <NrrImpactTab nrrData={nrrData} handleExport={handleExport} /> :
+         activeTab === 'Net Retention Impact' ? <NetRetentionTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'Win Rate' ? <WinRateTab data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'Attachment Rate' ? <AttachmentRateDashboard data={productFilteredData} dateRange={dateRange} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
          activeTab === 'POV Analysis' ? <PovImpactTab data={productFilteredData} hasGlobalData={data.length > 0} handleExport={handleExport} /> :
