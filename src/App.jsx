@@ -1528,30 +1528,30 @@ export default function App() {
         from += PAGE;
       }
       const parsedData = allRows.map(row => {
-        const closeDate = row.close_date ? new Date(row.close_date) : null;
+        const closeDate = row["Close Date"] ? new Date(row["Close Date"]) : null;
         return {
           date: closeDate,
           monthKey: closeDate && !isNaN(closeDate) ? `${closeDate.getFullYear()}-${String(closeDate.getMonth() + 1).padStart(2, '0')}` : "",
           monthLabel: closeDate && !isNaN(closeDate) ? `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][closeDate.getMonth()]} ${closeDate.getFullYear()}` : "",
-          value: parseFloat(row.bookings_value) || 0,
-          type: row.type || '',
-          product: row.product_type || '',
-          stage: row.stage || '',
-          account: (row.account_name || row.account_id || '').toLowerCase().trim(),
-          accountId: (row.account_id || '').trim(),
-          churnDate: row.churn_date || '',
-          hasSE: row.has_se || '',
-          ae: row.ae || '',
-          se: row.se || '',
-          region: row.region || '',
-          stageWhenSEAssigned: row.stage_when_se_assigned || '',
-          keywords: row.keywords || '',
-          seActivity: row.se_activity || '',
-          technicalFit: row.technical_fit || '',
-          lossReason: row.loss_reason || '',
-          age: Math.round(parseFloat(row.age) || 0),
-          ltv: parseFloat(row.ltv) || 0,
-          hasPOV: !!row.pov_start_date,
+          value: parseFloat(row["Bookings Value"] || row["Amount"] || "0") || 0,
+          type: row["Type"] || '',
+          product: row["Product Type"] || '',
+          stage: row["Stage"] || '',
+          account: (row["Account Name"] || row["Account ID"] || '').toLowerCase().trim(),
+          accountId: (row["Account ID"] || '').trim(),
+          churnDate: row["Churn Date"] || '',
+          hasSE: row["Has Solutions Engineer?"] || '',
+          ae: row["Opportunity Owner"] || '',
+          se: row["Solutions Engineer"] || '',
+          region: row["Owner Region"] || '',
+          stageWhenSEAssigned: row["Stage When SE Assigned"] || '',
+          keywords: row["Technical Fit Notes"] || row["Own the Technical Outcome"] || row["Own the Outcome"] || '',
+          seActivity: row["SE Activity"] || row["Primary Activity"] || '',
+          technicalFit: row["Technical Fit Rating"] || '',
+          lossReason: row["Reason for Lost Opportunity"] || '',
+          age: Math.round(parseFloat(row["Age"]) || 0),
+          ltv: parseFloat(row["Lifetime Value (LTV)"] || "0") || 0,
+          hasPOV: !!(row["POV / Trial Start Date"] || row["POV Start Date"]),
         };
       });
       setData(parsedData);
