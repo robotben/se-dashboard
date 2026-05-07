@@ -196,6 +196,14 @@ const NRR_IMPACT_DATA = {
     { stage: 'Pricing & Negotiation', count: 43  },
     { stage: 'Prospect',              count: 43  },
   ],
+  ltvByStage: [
+    { stage: 'Pricing & Negotiation', medianLTV: 55000, n: 43  },
+    { stage: 'Technical Proof',       medianLTV: 32000, n: 80  },
+    { stage: 'Contract',              medianLTV: 24500, n: 48  },
+    { stage: 'Business Alignment',    medianLTV: 18500, n: 129 },
+    { stage: 'Prospect',              medianLTV: 14200, n: 43  },
+    { stage: 'Discovery',             medianLTV: 12800, n: 265 },
+  ],
 };
 
 // ─── UTILITIES ──────────────────────────────────────────────────────
@@ -1139,7 +1147,7 @@ const NrrCountTooltip = ({ active, payload, label }) => {
 };
 
 const NrrImpactTab = ({ nrrData, handleExport }) => {
-  const { cohorts, ltvBuckets, regionMedianLTV, stageWhenAssigned } = nrrData;
+  const { cohorts, ltvBuckets, regionMedianLTV, stageWhenAssigned, ltvByStage } = nrrData;
 
   const medianMult = cohorts.noSe.medianLTV > 0
     ? (cohorts.se.medianLTV / cohorts.noSe.medianLTV).toFixed(1) : '–';
@@ -1260,6 +1268,24 @@ const NrrImpactTab = ({ nrrData, handleExport }) => {
           </p>
         </Card>
       </div>
+
+      {/* Section 4b — Median LTV by Stage When SE Assigned */}
+      <Card id="nrr-ltv-stage" style={{ position: 'relative' }}>
+        <ExportActions onCopy={() => handleExport('nrr-ltv-stage', 'nrr-ltv-stage.png', 'copy')} onDownload={() => handleExport('nrr-ltv-stage', 'nrr-ltv-stage.png', 'download')} />
+        <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Median LTV by Stage When SE Assigned</h2>
+        <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts — median LTV by genesis deal stage, sorted by value</p>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={ltvByStage} layout="vertical" margin={{ top: 0, right: 60, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
+            <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
+            <YAxis type="category" dataKey="stage" width={155} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+            <Bar dataKey="medianLTV" name="Median LTV" fill={C.green} radius={[0, 4, 4, 0]}>
+              <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
 
       {/* Section 5 — Data quality callout */}
       <Card id="nrr-quality" style={{ position: 'relative' }}>
@@ -1582,10 +1608,18 @@ export default function App() {
       .sort((a, b) => b.medianLTV - a.medianLTV);
 
     const stageMap = {};
-    seAccs.forEach(a => { if (a.stageWhenAssigned) stageMap[a.stageWhenAssigned] = (stageMap[a.stageWhenAssigned] || 0) + 1; });
+    seAccs.forEach(a => {
+      if (!a.stageWhenAssigned) return;
+      if (!stageMap[a.stageWhenAssigned]) stageMap[a.stageWhenAssigned] = { ltvs: [], count: 0 };
+      stageMap[a.stageWhenAssigned].ltvs.push(a.ltv);
+      stageMap[a.stageWhenAssigned].count++;
+    });
     const stageWhenAssigned = Object.entries(stageMap)
-      .map(([stage, count]) => ({ stage, count }))
+      .map(([stage, { count }]) => ({ stage, count }))
       .sort((a, b) => b.count - a.count);
+    const ltvByStage = Object.entries(stageMap)
+      .map(([stage, { ltvs, count }]) => ({ stage, medianLTV: Math.round(median(ltvs)), n: count }))
+      .sort((a, b) => b.medianLTV - a.medianLTV);
 
     return {
       cohorts: {
@@ -1595,6 +1629,7 @@ export default function App() {
       ltvBuckets: BKTS.map(l => ({ label: l, se: seBkt[l], noSe: noBkt[l] })),
       regionMedianLTV,
       stageWhenAssigned,
+      ltvByStage,
     };
   }, [data]);
 
