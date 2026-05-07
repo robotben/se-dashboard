@@ -511,9 +511,9 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
 
     const finalHeat = sortedKwEntries.map(([act, c]) => ({
       activity: act,
-      mid: c.midD.size > 0 ? Math.round(c.midWon.size / c.midD.size * 100) : null,
-      large: c.lrgD.size > 0 ? Math.round(c.lrgWon.size / c.lrgD.size * 100) : null,
-      enterprise: c.entD.size > 0 ? Math.round(c.entWon.size / c.entD.size * 100) : null,
+      mid: c.midD.size > 0 ? Math.round(c.midWon.size / c.midD.size * 100) : null, midN: c.midD.size,
+      large: c.lrgD.size > 0 ? Math.round(c.lrgWon.size / c.lrgD.size * 100) : null, largeN: c.lrgD.size,
+      enterprise: c.entD.size > 0 ? Math.round(c.entWon.size / c.entD.size * 100) : null, enterpriseN: c.entD.size,
     }));
     
     const STAGE_ORDER = ['Pricing and Negotiation', 'Technical Proof', 'Business Alignment', 'Discovery'];
@@ -536,6 +536,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
     return { val: m, activity: a };
   }, [winStats.heatmap]);
 
+  const [hoveredHeat, setHoveredHeat] = useState(null);
   const getHeatColor = (v) => v === null ? 'transparent' : (v<=20?'#7B1F1F':v<=29?'#8B4A1A':v<=36?'#5A6B1A':v<=43?'#1A5C2A':'#0D3D1A');
 
   return (
@@ -608,14 +609,27 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
               <tbody>{winStats.heatmap.map((r, i) => (
                 <tr key={i}>
                   <td style={{ fontSize: '12px', color: '#C8D6E5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '140px' }} title={r.activity}>{r.activity}</td>
-                  {['mid', 'large', 'enterprise'].map(k => (
-                    <td key={k} style={{ textAlign: 'center' }}>
-                      <div style={{ height: '40px', background: getHeatColor(r[k]), borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, position: 'relative' }}>
-                        {r[k] !== null ? `${r[k]}%` : '-'}
-                        {r[k] === maxHeat.val && r.activity === maxHeat.activity && <span style={{ position: 'absolute', top: -5, right: -5 }}>⭐</span>}
-                      </div>
-                    </td>
-                  ))}
+                  {['mid', 'large', 'enterprise'].map(k => {
+                    const nKey = k === 'mid' ? 'midN' : k === 'large' ? 'largeN' : 'enterpriseN';
+                    const isHovered = hoveredHeat && hoveredHeat.row === i && hoveredHeat.col === k;
+                    return (
+                      <td key={k} style={{ textAlign: 'center' }}>
+                        <div
+                          onMouseEnter={() => setHoveredHeat({ row: i, col: k })}
+                          onMouseLeave={() => setHoveredHeat(null)}
+                          style={{ height: '40px', background: getHeatColor(r[k]), borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, position: 'relative', cursor: 'default' }}
+                        >
+                          {r[k] !== null ? `${r[k]}%` : '-'}
+                          {r[k] === maxHeat.val && r.activity === maxHeat.activity && <span style={{ position: 'absolute', top: -5, right: -5 }}>⭐</span>}
+                          {isHovered && r[k] !== null && r[nKey] > 0 && (
+                            <div style={{ position: 'absolute', bottom: '110%', left: '50%', transform: 'translateX(-50%)', background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: '4px', padding: '4px 8px', fontSize: '11px', fontWeight: 600, color: COLORS.text, whiteSpace: 'nowrap', zIndex: 20, pointerEvents: 'none' }}>
+                              n={r[nKey]} deals
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}</tbody>
             </table>
