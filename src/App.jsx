@@ -1106,6 +1106,15 @@ const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
       ],
     };
 
+    // Pass 1: find accounts that had an SE-attached New Business close
+    const seAccounts = new Set();
+    data.forEach(d => {
+      if (d.stage !== 'Closed Won' || d.type !== 'New Business' || !d.account) return;
+      const isSE = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
+      if (isSE) seAccounts.add(d.account);
+    });
+
+    // Pass 2: compute LTV — renewals from SE-touched accounts count as SE
     let seSum = 0, seN = 0, noSeSum = 0, noSeN = 0;
     let seMultSum = 0, seMultN = 0, noSeMultSum = 0, noSeMultN = 0;
     const bands = [
@@ -1118,7 +1127,8 @@ const NetRetentionTab = ({ data, hasGlobalData, handleExport }) => {
 
     data.forEach(d => {
       if (d.stage !== 'Closed Won' || !d.ltv || d.ltv <= 0) return;
-      const isSE = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
+      const isSEDirect = d.hasSE === "1" || String(d.hasSE).toLowerCase() === 'true' || String(d.hasSE).toLowerCase() === 'yes';
+      const isSE = isSEDirect || (d.account && seAccounts.has(d.account));
       if (isSE) {
         seSum += d.ltv; seN++;
         if (d.value > 0) { seMultSum += d.ltv / d.value; seMultN++; }
@@ -1254,6 +1264,7 @@ export default function App() {
           monthLabel: closeDate && !isNaN(closeDate) ? `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][closeDate.getMonth()]} ${closeDate.getFullYear()}` : "",
           value: parseFloat(String(row["Bookings Value"] || row["Amount"] || row["Value"] || "0").replace(/[^0-9.-]+/g, "")) || 0,
           type: row["Type"], product: row["Product Type"], stage: row["Stage"],
+          account: (getFuzzyCol(row, ['account name', 'account id', 'account']) || row["Account Name"] || row["Account ID"] || "").toLowerCase().trim(),
           hasSE: getFuzzyCol(row, ['has solutions engineer', 'se attached', 'has se']) || row["Has Solutions Engineer?"],
           ae: row["Account Executive"] || row["Opportunity Owner"] || "", se: row["Solutions Engineer"] || "",
           region: row["Owner Region"] || row["Region"] || "", 
