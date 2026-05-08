@@ -1345,7 +1345,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
               <Bar dataKey="seLtv" name="SE Avg LTV" fill={C.accent} radius={[4, 4, 0, 0]}>
                 <LabelList dataKey="seN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: C.textDim, fontSize: 10 }} />
               </Bar>
-              <Bar dataKey="noSeLtv" name="No SE Avg LTV" fill={COLORS.borderMuted} radius={[4, 4, 0, 0]}>
+              <Bar dataKey="noSeLtv" name="No SE Avg LTV" fill={C.orange} radius={[4, 4, 0, 0]}>
                 <LabelList dataKey="noSeN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: C.textDim, fontSize: 10 }} />
               </Bar>
             </BarChart>
