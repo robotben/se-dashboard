@@ -1230,24 +1230,6 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
       {/* Section 1 — Insight banner */}
-      <Card accentColor={C.accent} id="nrr-banner" style={{ position: 'relative' }}>
-        <ExportActions onCopy={() => handleExport('nrr-banner', 'nrr-banner.png', 'copy')} onDownload={() => handleExport('nrr-banner', 'nrr-banner.png', 'download')} />
-        <div style={{ fontSize: '20px', fontWeight: 800, color: C.text, marginBottom: '8px' }}>
-          SE-attached accounts show <span style={{ color: C.accent }}>{medianMult}× higher median LTV</span>
-        </div>
-        <div style={{ fontSize: '13px', color: C.textMuted, marginBottom: '16px' }}>
-          Based on {cohorts.se.n + cohorts.noSe.n} closed-won new business accounts grouped by Account ID · SE cohort: n={cohorts.se.n} · No-SE cohort: n={cohorts.noSe.n}
-        </div>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <div style={{ background: hexToRgba(C.accent, 0.1), border: `1px solid ${C.accent}`, borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 700, color: C.accent }}>
-            {expansionMult}× higher expansion rate
-          </div>
-          <div style={{ background: hexToRgba(C.green, 0.1), border: `1px solid ${C.green}`, borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 700, color: C.green }}>
-            {cohorts.se.churnRate.toFixed(1)}% vs {cohorts.noSe.churnRate.toFixed(1)}% churn
-          </div>
-        </div>
-      </Card>
-
       {/* Section 2 — 6 metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px' }}>
         {[
@@ -1395,23 +1377,6 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
       </Card>
 
       {/* Section 5 — Data quality callout */}
-      <Card id="nrr-quality" style={{ position: 'relative' }}>
-        <ExportActions onCopy={() => handleExport('nrr-quality', 'nrr-quality.png', 'copy')} onDownload={() => handleExport('nrr-quality', 'nrr-quality.png', 'download')} />
-        <SectionLabel>DATA QUALITY NOTES</SectionLabel>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-          {[
-            'POC signal sparse (24 records) — directional only, not statistically robust',
-            'Churn date populated on 987 of 14,315 records — survival analysis will strengthen as backfill increases',
-            'AMER Enterprise LTV anomaly ($0 median) worth investigating separately — likely reflects recent closes with LTV not yet recorded',
-          ].map((note, i) => (
-            <div key={i} style={{ display: 'flex', gap: '10px', fontSize: '12px', color: C.textMuted }}>
-              <span style={{ color: C.textDim, flexShrink: 0 }}>·</span>
-              <span>{note}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
     </div>
   );
 };
