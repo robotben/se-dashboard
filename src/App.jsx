@@ -1355,51 +1355,26 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         )}
       </Card>
 
-      {/* Section 4 — Side-by-side charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-
-        {/* Regional Median LTV */}
-        <Card id="nrr-region" style={{ position: 'relative' }}>
-          <ExportActions onCopy={() => handleExport('nrr-region', 'nrr-region.png', 'copy')} onDownload={() => handleExport('nrr-region', 'nrr-region.png', 'download')} />
-          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Regional Median LTV</h2>
-          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts only</p>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={regionMedianLTV} layout="vertical" margin={{ top: 0, right: 50, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
-              <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
-              <YAxis type="category" dataKey="region" width={145} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
-              <Bar dataKey="medianLTV" name="Median LTV" fill={C.accent} radius={[0, 4, 4, 0]}>
-                <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <p style={{ fontSize: '11px', color: C.textDim, fontStyle: 'italic', margin: '12px 0 0 0' }}>
-            AMER Enterprise n=12 shows $0 median — likely incomplete LTV data for recent closes
-          </p>
-        </Card>
-
-        {/* Stage when SE assigned */}
-        <Card id="nrr-stage" style={{ position: 'relative' }}>
-          <ExportActions onCopy={() => handleExport('nrr-stage', 'nrr-stage.png', 'copy')} onDownload={() => handleExport('nrr-stage', 'nrr-stage.png', 'download')} />
-          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Stage When SE Assigned</h2>
-          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts — genesis deal</p>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={stageWhenAssigned} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
-              <XAxis type="number" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
-              <YAxis type="category" dataKey="stage" width={155} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
-              <Bar dataKey="count" name="Count" fill={C.accent} radius={[0, 4, 4, 0]}>
-                <LabelList dataKey="count" position="right" style={{ fill: C.textDim, fontSize: 10 }} />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <p style={{ fontSize: '11px', color: C.textDim, fontStyle: 'italic', margin: '12px 0 0 0' }}>
-            Discovery + Business Alignment = 76% of SE assignments — healthy early coverage
-          </p>
-        </Card>
-      </div>
+      {/* Section 4 — Regional Median LTV */}
+      <Card id="nrr-region" style={{ position: 'relative' }}>
+        <ExportActions onCopy={() => handleExport('nrr-region', 'nrr-region.png', 'copy')} onDownload={() => handleExport('nrr-region', 'nrr-region.png', 'download')} />
+        <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Regional Median LTV</h2>
+        <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts only</p>
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={regionMedianLTV} layout="vertical" margin={{ top: 0, right: 50, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
+            <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
+            <YAxis type="category" dataKey="region" width={145} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+            <Bar dataKey="medianLTV" name="Median LTV" fill={C.accent} radius={[0, 4, 4, 0]}>
+              <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+        <p style={{ fontSize: '11px', color: C.textDim, fontStyle: 'italic', margin: '12px 0 0 0' }}>
+          AMER Enterprise n=12 shows $0 median — likely incomplete LTV data for recent closes
+        </p>
+      </Card>
 
       {/* Section 4b — Median LTV by Stage When SE Assigned */}
       <Card id="nrr-ltv-stage" style={{ position: 'relative' }}>
