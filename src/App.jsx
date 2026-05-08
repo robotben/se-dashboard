@@ -1286,95 +1286,94 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         </Card>
       </div>
 
-      {/* Section 3 — LTV Distribution */}
-      <Card id="nrr-ltv-dist" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('nrr-ltv-dist', 'nrr-ltv-dist.png')} />
-        <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>LTV Distribution by Cohort</h2>
-        <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>Account count by LTV band — SE-attached vs No SE</p>
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: C.accent }}>
-            <span style={{ width: 10, height: 10, background: C.accent, borderRadius: '2px', display: 'inline-block' }} />SE-attached
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: C.orange }}>
-            <span style={{ width: 10, height: 10, background: C.orange, borderRadius: '2px', display: 'inline-block' }} />No SE
-          </span>
-        </div>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={ltvBuckets.filter(b => b.label !== '$0' && b.label !== '$1–10k')} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
-            <XAxis dataKey="label" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
-            <YAxis stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
-            <Tooltip content={<NrrCountTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
-            <Bar dataKey="se"   name="SE-attached" fill={C.accent} radius={[4, 4, 0, 0]} />
-            <Bar dataKey="noSe" name="No SE"        fill={C.orange} radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
-
-      {/* Section 3b — Avg LTV by ACV Band */}
-      <Card id="nri-band-chart" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('nri-band-chart', 'nri-band-chart.png')} />
-        <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>Avg LTV by ACV Band</h2>
-        <p style={{ fontSize: '12px', color: C.textMuted, marginBottom: '20px' }}>Closed Won deals with LTV &gt; 0 · SE renewal attribution applied</p>
-        {stats.bandData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats.bandData.filter(b => b.band !== '$0–$10K')} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+      {/* Section 3 — LTV charts side by side */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <Card id="nrr-ltv-dist" style={{ position: 'relative' }}>
+          <ExportActions onDownload={() => handleExport('nrr-ltv-dist', 'nrr-ltv-dist.png')} />
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>LTV Distribution by Cohort</h2>
+          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>Account count by LTV band — SE-attached vs No SE</p>
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: C.accent }}>
+              <span style={{ width: 10, height: 10, background: C.accent, borderRadius: '2px', display: 'inline-block' }} />SE-attached
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: C.orange }}>
+              <span style={{ width: 10, height: 10, background: C.orange, borderRadius: '2px', display: 'inline-block' }} />No SE
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={ltvBuckets.filter(b => b.label !== '$0' && b.label !== '$1–10k')} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
-              <XAxis dataKey="band" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
-              <YAxis tickFormatter={v => formatCurrency(v)} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="label" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
+              <YAxis stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <Tooltip content={<NrrCountTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+              <Bar dataKey="se"   name="SE-attached" fill={C.accent} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="noSe" name="No SE"        fill={C.orange} radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+
+        <Card id="nri-band-chart" style={{ position: 'relative' }}>
+          <ExportActions onDownload={() => handleExport('nri-band-chart', 'nri-band-chart.png')} />
+          <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>Avg LTV by ACV Band</h2>
+          <p style={{ fontSize: '12px', color: C.textMuted, marginBottom: '20px' }}>Closed Won deals with LTV &gt; 0 · SE renewal attribution applied</p>
+          {stats.bandData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={stats.bandData.filter(b => b.band !== '$0–$10K')} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
+                <XAxis dataKey="band" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
+                <YAxis tickFormatter={v => formatCurrency(v)} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+                <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: C.text }} />
+                <Bar dataKey="seLtv" name="SE Avg LTV" fill={C.accent} radius={[4, 4, 0, 0]}>
+                  <LabelList dataKey="seN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: C.textDim, fontSize: 10 }} />
+                </Bar>
+                <Bar dataKey="noSeLtv" name="No SE Avg LTV" fill={C.orange} radius={[4, 4, 0, 0]}>
+                  <LabelList dataKey="noSeN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: C.textDim, fontSize: 10 }} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.textDim }}>No LTV data found. Ensure your CSV includes a Lifetime Value (LTV) column.</div>
+          )}
+        </Card>
+      </div>
+
+      {/* Section 4 — Regional + Stage side by side */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <Card id="nrr-region" style={{ position: 'relative' }}>
+          <ExportActions onDownload={() => handleExport('nrr-region', 'nrr-region.png')} />
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Regional Median LTV</h2>
+          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts only</p>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={regionMedianLTV} layout="vertical" margin={{ top: 0, right: 50, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
+              <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
+              <YAxis type="category" dataKey="region" width={145} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
-              <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: C.text }} />
-              <Bar dataKey="seLtv" name="SE Avg LTV" fill={C.accent} radius={[4, 4, 0, 0]}>
-                <LabelList dataKey="seN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: C.textDim, fontSize: 10 }} />
-              </Bar>
-              <Bar dataKey="noSeLtv" name="No SE Avg LTV" fill={C.orange} radius={[4, 4, 0, 0]}>
-                <LabelList dataKey="noSeN" position="top" formatter={v => v > 0 ? `n=${v}` : ''} style={{ fill: C.textDim, fontSize: 10 }} />
+              <Bar dataKey="medianLTV" name="Median LTV" fill={C.accent} radius={[0, 4, 4, 0]}>
+                <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        ) : (
-          <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.textDim }}>No LTV data found. Ensure your CSV includes a Lifetime Value (LTV) column.</div>
-        )}
-      </Card>
+        </Card>
 
-      {/* Section 4 — Regional Median LTV */}
-      <Card id="nrr-region" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('nrr-region', 'nrr-region.png')} />
-        <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Regional Median LTV</h2>
-        <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts only</p>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={regionMedianLTV} layout="vertical" margin={{ top: 0, right: 50, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
-            <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
-            <YAxis type="category" dataKey="region" width={145} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
-            <Bar dataKey="medianLTV" name="Median LTV" fill={C.accent} radius={[0, 4, 4, 0]}>
-              <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-        <p style={{ fontSize: '11px', color: C.textDim, fontStyle: 'italic', margin: '12px 0 0 0' }}>
-          AMER Enterprise n=12 shows $0 median — likely incomplete LTV data for recent closes
-        </p>
-      </Card>
-
-      {/* Section 4b — Median LTV by Stage When SE Assigned */}
-      <Card id="nrr-ltv-stage" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('nrr-ltv-stage', 'nrr-ltv-stage.png')} />
-        <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Median LTV by Stage When SE Assigned</h2>
-        <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts — median LTV by genesis deal stage, sorted by value</p>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={ltvByStage} layout="vertical" margin={{ top: 0, right: 60, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
-            <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
-            <YAxis type="category" dataKey="stage" width={155} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
-            <Bar dataKey="medianLTV" name="Median LTV" fill={C.green} radius={[0, 4, 4, 0]}>
-              <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
+        <Card id="nrr-ltv-stage" style={{ position: 'relative' }}>
+          <ExportActions onDownload={() => handleExport('nrr-ltv-stage', 'nrr-ltv-stage.png')} />
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Median LTV by Stage When SE Assigned</h2>
+          <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts — median LTV by genesis deal stage, sorted by value</p>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={ltvByStage} layout="vertical" margin={{ top: 0, right: 60, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={COLORS.borderMuted} />
+              <XAxis type="number" tickFormatter={fmtK} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={{ stroke: C.border }} />
+              <YAxis type="category" dataKey="stage" width={155} stroke={C.textDim} tick={{ fill: C.textMuted, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: C.border, opacity: 0.4 }} />
+              <Bar dataKey="medianLTV" name="Median LTV" fill={C.green} radius={[0, 4, 4, 0]}>
+                <LabelList dataKey="n" position="right" formatter={v => `n=${v}`} style={{ fill: C.textDim, fontSize: 10 }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
 
       {/* Section 5 — Data quality callout */}
     </div>
