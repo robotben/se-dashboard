@@ -1318,7 +1318,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
           </span>
         </div>
         <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={ltvBuckets} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <BarChart data={ltvBuckets.filter(b => b.label !== '$0' && b.label !== '$1–10k')} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
             <XAxis dataKey="label" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
             <YAxis stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
@@ -1336,7 +1336,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         <p style={{ fontSize: '12px', color: C.textMuted, marginBottom: '20px' }}>Closed Won deals with LTV &gt; 0 · SE renewal attribution applied</p>
         {stats.bandData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats.bandData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
+            <BarChart data={stats.bandData.filter(b => b.band !== '$0–$10K')} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.borderMuted} />
               <XAxis dataKey="band" stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 12 }} tickLine={false} axisLine={{ stroke: C.border }} />
               <YAxis tickFormatter={v => formatCurrency(v)} stroke={C.textDim} tick={{ fill: C.textDim, fontSize: 11 }} tickLine={false} axisLine={false} />
