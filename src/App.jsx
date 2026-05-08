@@ -466,7 +466,7 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
         ].map(k => (
           <Card key={k.id} id={k.id} style={{ position: 'relative' }}>
             <ExportActions onDownload={() => handleExport(k.id, `${k.id}.png`)} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <SectionLabel style={{ margin: 0 }}>{k.label}</SectionLabel>
               <InfoButton title={k.info.title} calc={k.info.calc} why={k.info.why} />
             </div>
@@ -656,28 +656,28 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
         <Card id="win-se" style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>SE WIN RATE</SectionLabel>
             <InfoButton title="SE Win Rate" calc="Won deals ÷ (Won + Lost deals) where Has Solutions Engineer = Yes, for deals ≥ $10K ACV." why="Primary measure of SE effectiveness in competitive deals." />
           </div>
           <div style={{ fontSize: '28px', fontWeight: 700, color: COLORS.blue, marginTop: '8px' }}>{winStats.kpis.overall.se}%</div>
         </Card>
         <Card id="win-nose" style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>NO SE WIN RATE</SectionLabel>
             <InfoButton title="No SE Win Rate" calc="Won deals ÷ (Won + Lost deals) where Has Solutions Engineer = No, for deals ≥ $10K ACV." why="Baseline win rate for deals without SE to benchmark SE impact." />
           </div>
           <div style={{ fontSize: '28px', fontWeight: 700, color: '#C8D6E5', marginTop: '8px' }}>{winStats.kpis.overall.noSe}%</div>
         </Card>
         <Card id="win-lift" style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>NB LIFT</SectionLabel>
             <InfoButton title="New Business Win Rate Lift" calc="SE New Business Win Rate − No-SE New Business Win Rate (in percentage points)." why="Positive lift means SE improves NB win rates; negative means SE is deployed on harder-than-average deals." caveat="SE is often assigned to the most competitive deals, so negative lift is expected and does not indicate poor performance." />
           </div>
           <div style={{ fontSize: '28px', fontWeight: 700, color: (winStats.kpis.newBusiness.se - winStats.kpis.newBusiness.noSe) >= 0 ? COLORS.green : COLORS.red, marginTop: '8px' }}>{(winStats.kpis.newBusiness.se - winStats.kpis.newBusiness.noSe).toFixed(1)}pp</div>
         </Card>
         <Card id="win-exp" style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>EXP WIN RATE</SectionLabel>
             <InfoButton title="Expansion Win Rate" calc="Won expansion deals ÷ (Won + Lost expansion deals) where Has Solutions Engineer = Yes, for deals ≥ $10K ACV." why="SE impact on renewal and expansion business — higher rates suggest SE involvement improves customer stickiness." />
           </div>
@@ -846,7 +846,7 @@ const PovImpactTab = ({ data, hasGlobalData, handleExport }) => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="pov-wr" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('pov-wr', 'pov-wr.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>{stats.mode} WIN RATE</SectionLabel>
             <InfoButton title="POV Win Rate" calc="Win rate of Vimeo Enterprise Closed Won/Lost deals where a POV/Trial Start Date is present." why="Measures the effectiveness of running a proof of value or trial in driving deal outcomes." />
           </div>
@@ -855,7 +855,7 @@ const PovImpactTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="pov-bv" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('pov-bv', 'pov-bv.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>WON AVG BV</SectionLabel>
             <InfoButton title="Won Avg Bookings Value" calc="Average Bookings Value of Closed Won deals that included a POV." why="Shows the typical deal size that benefits from a POV — useful for deciding when a POV is worth the investment." />
           </div>
@@ -863,7 +863,7 @@ const PovImpactTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="pov-age" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('pov-age', 'pov-age.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>CYCLE TIME</SectionLabel>
             <InfoButton title="POV Cycle Time" calc="Average deal age (days from creation to close) for POV deals, weighted by deal count." why="POVs add time to deals. This measures the tradeoff between POV win rate uplift and extended cycle time." caveat="Cycle time includes the full deal lifetime, not just the POV period." />
           </div>
@@ -988,7 +988,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="fit-kpi-low" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('fit-kpi-low', 'fit-kpi-low.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>LOW FIT WIN RATE</SectionLabel>
             <InfoButton title="Low Technical Fit Win Rate" calc="Win rate of SE-attached Closed Won/Lost deals rated as Low technical fit (keywords: weak, low, poor, or score 1–2)." why="Establishes the floor — deals where Vimeo's platform is a poor fit for the customer's needs." />
           </div>
@@ -996,7 +996,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="fit-kpi-med" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('fit-kpi-med', 'fit-kpi-med.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>MEDIUM FIT WIN RATE</SectionLabel>
             <InfoButton title="Medium Technical Fit Win Rate" calc="Win rate of SE-attached deals rated Medium fit (keywords: medium, average, neutral, or score 3)." why="Shows the win rate when the product meets basic requirements but lacks differentiation." />
           </div>
@@ -1004,7 +1004,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="fit-kpi-high" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('fit-kpi-high', 'fit-kpi-high.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>HIGH FIT WIN RATE</SectionLabel>
             <InfoButton title="High Technical Fit Win Rate" calc="Win rate of SE-attached deals rated High fit (keywords: strong, high, great, or score 4–5)." why="The target benchmark — deals where Vimeo's capabilities are a strong match for customer requirements." />
           </div>
@@ -1203,7 +1203,7 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="loss-kpi-bv" style={{ position: 'relative' }} accentColor={COLORS.red}>
            <ExportActions onDownload={() => handleExport('loss-kpi-bv', 'loss-kpi-bv.png')} />
-           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
              <SectionLabel style={{ margin: 0 }}>SE ATTACHED LOST BV</SectionLabel>
              <InfoButton title="SE-Attached Lost Bookings Value" calc="Sum of Bookings Value for all Closed Lost deals where Has Solutions Engineer = Yes." why="Quantifies the revenue at risk that SE teams engaged but did not close — informs post-mortem prioritization." />
            </div>
@@ -1211,7 +1211,7 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="loss-kpi-deals" style={{ position: 'relative' }}>
            <ExportActions onDownload={() => handleExport('loss-kpi-deals', 'loss-kpi-deals.png')} />
-           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
              <SectionLabel style={{ margin: 0 }}>LOST DEALS (SE ATTACHED)</SectionLabel>
              <InfoButton title="SE-Attached Lost Deals" calc="Count of Closed Lost deals where Has Solutions Engineer = Yes." why="Volume of SE-engaged opportunities lost. Context for the bookings value metric above." />
            </div>
@@ -1219,7 +1219,7 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="loss-kpi-age" style={{ position: 'relative' }}>
            <ExportActions onDownload={() => handleExport('loss-kpi-age', 'loss-kpi-age.png')} />
-           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
              <SectionLabel style={{ margin: 0 }}>AVG AGE OF LOST DEALS</SectionLabel>
              <InfoButton title="Avg Age of Lost Deals" calc="Average deal age (days from creation to Closed Lost) for SE-attached lost deals." why="Long average ages on lost deals may indicate qualification issues — deals that dragged on without SE disqualifying them early." />
            </div>
@@ -1388,7 +1388,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         ].map(k => (
           <Card key={k.id} id={k.id} style={{ position: 'relative' }}>
             <ExportActions onDownload={() => handleExport(k.id, `${k.id}.png`)} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <SectionLabel style={{ margin: 0 }}>{k.label}</SectionLabel>
               <InfoButton title={k.info.title} calc={k.info.calc} why={k.info.why} caveat={k.info.caveat} />
             </div>
@@ -1401,7 +1401,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="nri-se-ltv" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('nri-se-ltv', 'nri-se-ltv.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>SE AVG LTV</SectionLabel>
             <InfoButton title="SE Avg LTV" calc="Average Lifetime Value across all Closed Won deals where Has Solutions Engineer = Yes and LTV > 0. SE renewal attribution applied: a renewal is counted as SE if the account's genesis NB deal had SE." why="Measures total revenue generated per SE-attached deal over the customer lifecycle." />
           </div>
@@ -1410,7 +1410,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="nri-nose-ltv" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('nri-nose-ltv', 'nri-nose-ltv.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>NO SE AVG LTV</SectionLabel>
             <InfoButton title="No SE Avg LTV" calc="Average Lifetime Value across all Closed Won deals without SE involvement and LTV > 0." why="Baseline for comparing the long-term revenue value of SE vs. non-SE deals." />
           </div>
@@ -1419,7 +1419,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="nri-lift" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('nri-lift', 'nri-lift.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>LTV LIFT</SectionLabel>
             <InfoButton title="LTV Lift" calc="(SE Avg LTV − No-SE Avg LTV) ÷ No-SE Avg LTV × 100." why="Quantifies the percentage premium in lifetime value attributable to SE involvement." caveat="Lift is computed on deal-level averages, not account cohorts. High-ACV deals are more likely to have SE, which may inflate the multiple." />
           </div>
@@ -1432,7 +1432,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
         <Card id="nri-se-mult" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('nri-se-mult', 'nri-se-mult.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>SE AVG LTV / ACV MULTIPLE</SectionLabel>
             <InfoButton title="SE Avg LTV / ACV Multiple" calc="For each SE-attached Closed Won deal: LTV ÷ ACV (Bookings Value). The multiple shown is the average across all such deals." why="Shows how many dollars of lifetime value are generated per dollar of initial contract — a retention and expansion efficiency metric." />
           </div>
@@ -1441,7 +1441,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="nri-nose-mult" style={{ position: 'relative' }}>
           <ExportActions onDownload={() => handleExport('nri-nose-mult', 'nri-nose-mult.png')} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <SectionLabel style={{ margin: 0 }}>NO SE AVG LTV / ACV MULTIPLE</SectionLabel>
             <InfoButton title="No SE Avg LTV / ACV Multiple" calc="Average of LTV ÷ ACV for each No-SE Closed Won deal." why="Baseline LTV/ACV efficiency for deals without SE involvement." />
           </div>
@@ -1937,7 +1937,7 @@ export default function App() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
               <Card id="kpi-nb-card" accentColor={COLORS.blue} style={{ position: 'relative' }}>
                 <ExportActions onDownload={() => handleExport('kpi-nb-card', 'kpi-nb-card.png')} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <SectionLabel style={{ margin: 0 }}>NEW BUSINESS</SectionLabel>
                   <InfoButton title="SE New Business Bookings" calc="Sum of Bookings Value for Closed Won New Business deals where Has Solutions Engineer = Yes, within the selected date range and product filter." why="Primary revenue contribution metric for SE-attached new logos." />
                 </div>
@@ -1946,7 +1946,7 @@ export default function App() {
               </Card>
               <Card id="kpi-exp-card" accentColor={COLORS.green} style={{ position: 'relative' }}>
                 <ExportActions onDownload={() => handleExport('kpi-exp-card', 'kpi-exp-card.png')} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <SectionLabel style={{ margin: 0 }}>EXPANSION</SectionLabel>
                   <InfoButton title="SE Expansion Bookings" calc="Sum of Bookings Value for Closed Won Upsell and Cross-Sell deals where Has Solutions Engineer = Yes." why="Measures SE impact on existing customer growth — both Upsell (higher tier) and Cross-Sell (new product line)." />
                 </div>
@@ -1955,7 +1955,7 @@ export default function App() {
               </Card>
               <Card id="kpi-total-card" accentColor={COLORS.indigo} style={{ position: 'relative' }}>
                 <ExportActions onDownload={() => handleExport('kpi-total-card', 'kpi-total-card.png')} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <SectionLabel style={{ margin: 0 }}>TOTAL SE BOOKINGS</SectionLabel>
                   <InfoButton title="Total SE Bookings" calc="Sum of all Closed Won Bookings Value where Has Solutions Engineer = Yes, across all deal types." why="Headline revenue metric showing the total economic footprint of SE engagement." />
                 </div>
