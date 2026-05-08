@@ -403,7 +403,7 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <div id="attachment-header" style={{ position: 'relative', background: `linear-gradient(135deg, ${V.black} 0%, ${V.pearlBlack} 100%)`, padding: '24px 32px', borderRadius: '8px', borderTop: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, borderLeft: `1px solid ${C.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('attachment-header', 'attachment-header.png')} />
         <div style={{ color: C.accent, fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', padding: '4px 10px', borderTop: `1px solid ${C.accent}`, borderRight: `1px solid ${C.accent}`, borderBottom: `1px solid ${C.accent}`, borderLeft: `1px solid ${C.accent}`, borderRadius: '999px', marginBottom: '16px', display: 'inline-block' }}>Vimeo SE Analytics</div>
         <h1 style={{ margin: '0 0 8px 0', fontSize: '36px', fontWeight: 800, background: `linear-gradient(135deg, ${V.pearlWhite}, ${V.blue})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>SE to AE Ratio</h1>
         <p style={{ margin: 0, color: C.textDim, fontSize: '13px' }}>{stats.seCount} SEs supporting {stats.aeWithSECount} AEs across {stats.seDealsTotal.toLocaleString()} deals</p>
@@ -426,7 +426,7 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
           <div id="attachment-won-card" style={{ position: 'relative', background: C.card, borderTop: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, borderLeft: `3px solid ${C.green}`, borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.4)', padding: '20px' }}>
-            <ExportActions onDownload={() => handleExport('\1', '\2')} />
+            <ExportActions onDownload={() => handleExport('attachment-won-card', 'attachment-won-card.png')} />
             <div style={{ fontSize: '11px', color: C.green, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '12px' }}>CLOSED WON</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
               <span style={{ fontSize: '40px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: C.green, lineHeight: 1 }}>{stats.seWon.toLocaleString()}</span>
@@ -436,7 +436,7 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
             <div style={{ fontSize: '13px', color: C.green, fontWeight: 700 }}>{formatCurrency(stats.seWonBV)} bookings won</div>
           </div>
           <div id="attachment-lost-card" style={{ position: 'relative', background: C.card, borderTop: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, borderLeft: `3px solid ${C.red}`, borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.4)', padding: '20px' }}>
-            <ExportActions onDownload={() => handleExport('\1', '\2')} />
+            <ExportActions onDownload={() => handleExport('attachment-lost-card', 'attachment-lost-card.png')} />
             <div style={{ fontSize: '11px', color: C.red, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '12px' }}>CLOSED LOST</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
               <span style={{ fontSize: '40px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: C.red, lineHeight: 1 }}>{stats.seLost.toLocaleString()}</span>
@@ -449,7 +449,7 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
       </div>
 
       <div id="attachment-deal-size-card" style={{ position: 'relative', background: C.card, borderTop: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, borderLeft: `1px solid ${C.border}`, borderRadius: '8px', padding: '24px' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('attachment-deal-size-card', 'attachment-deal-size-card.png')} />
         <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 700, color: C.text }}>SE attachment by deal size</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
           {stats.bucketData.map((b, i) => {
@@ -474,7 +474,7 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
       </div>
 
       <div id="attachment-table-card" style={{ position: 'relative', background: C.card, borderTop: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, borderLeft: `1px solid ${C.border}`, borderRadius: '8px', overflow: 'hidden' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('attachment-table-card', 'attachment-table-card.png')} />
         <div style={{ padding: '16px', borderBottom: `1px solid ${V.ebony}` }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>SE utilization by owner region</h2></div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead><tr style={{ background: V.ebony, color: C.textMuted, fontSize: '10px', textTransform: 'uppercase' }}>{['Region', 'AEs', 'SEs', 'SE Deals', 'Win %', 'No SE Win %', 'SE Won BV'].map(h => <th key={h} style={{ padding: '12px', textAlign: h==='Region'?'left':'right' }}>{h}</th>)}</tr></thead>
@@ -597,7 +597,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
       </div>
 
       <Card id="win-diff" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('win-diff', 'win-diff.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>SE Win Rate Differential</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={winStats.diffData}>
@@ -615,7 +615,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
       </Card>
 
       <Card id="win-stage" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('win-stage', 'win-stage.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Win Rate by Stage of SE Assignment</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
           {winStats.stages.length > 0 ? winStats.stages.map((s, i) => {
@@ -639,7 +639,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
         <Card id="win-heat" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('win-heat', 'win-heat.png')} />
           <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Keyword Win Rate x Deal Size</h2>
           <p style={{ fontSize: '12px', color: COLORS.textMuted, marginBottom: '20px' }}>Opportunity win rates based on top keywords and band</p>
           
@@ -679,7 +679,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
         </Card>
 
         <Card id="win-kw" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('win-kw', 'win-kw.png')} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Keyword Frequency</h2>
           
           <ResponsiveContainer width="100%" height={300}>
@@ -744,25 +744,25 @@ const PovImpactTab = ({ data, hasGlobalData, handleExport }) => {
       <h2 style={{ fontSize: '20px', fontWeight: 700, color: COLORS.text, margin: 0 }}>Vimeo Enterprise Only</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="pov-wr" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('pov-wr', 'pov-wr.png')} />
           <SectionLabel>{stats.mode} WIN RATE</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.blue }}>{stats.winRate}%</div>
           <div style={{ fontSize: '12px', color: COLORS.textDim }}>n={stats.n.toLocaleString()} deals</div>
         </Card>
         <Card id="pov-bv" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('pov-bv', 'pov-bv.png')} />
           <SectionLabel>WON AVG BV</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.green }}>{formatCurrency(stats.avgBV)}</div>
         </Card>
         <Card id="pov-age" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('pov-age', 'pov-age.png')} />
           <SectionLabel>CYCLE TIME</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.orange }}>{stats.cycleTime}d</div>
         </Card>
       </div>
 
       <Card id="pov-deal-size" style={{ position: 'relative', padding: '24px' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('pov-deal-size', 'pov-deal-size.png')} />
         <h2 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '20px' }}>POV Win Rates by Deal Size</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
           {stats.bands.map((b, i) => (
@@ -874,17 +874,17 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="fit-kpi-low" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('fit-kpi-low', 'fit-kpi-low.png')} />
           <SectionLabel>LOW FIT WIN RATE</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.red }}>{stats.kpis.lowWR}%</div>
         </Card>
         <Card id="fit-kpi-med" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('fit-kpi-med', 'fit-kpi-med.png')} />
           <SectionLabel>MEDIUM FIT WIN RATE</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.orange }}>{stats.kpis.medWR}%</div>
         </Card>
         <Card id="fit-kpi-high" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('fit-kpi-high', 'fit-kpi-high.png')} />
           <SectionLabel>HIGH FIT WIN RATE</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.green }}>{stats.kpis.highWR}%</div>
         </Card>
@@ -892,7 +892,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px' }}>
         <Card id="fit-bar-chart" style={{ position: 'relative', height: '420px' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('fit-bar-chart', 'fit-bar-chart.png')} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px' }}>Win Rate by Deal Size & Technical Fit</h2>
           <div style={{ height: '320px' }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -911,7 +911,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
         </Card>
 
         <Card id="fit-heatmap" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('fit-heatmap', 'fit-heatmap.png')} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px' }}>Heatmap Analysis</h2>
           <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '6px' }}>
             <thead>
@@ -942,7 +942,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
       </div>
 
       <Card id="fit-age-chart" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('fit-age-chart', 'fit-age-chart.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px' }}>Deal Age by Deal Size & Technical Fit</h2>
         <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '6px' }}>
           <thead>
@@ -1071,17 +1071,17 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="loss-kpi-bv" style={{ position: 'relative' }} accentColor={COLORS.red}>
-           <ExportActions onDownload={() => handleExport('\1', '\2')} />
+           <ExportActions onDownload={() => handleExport('loss-kpi-bv', 'loss-kpi-bv.png')} />
            <SectionLabel>SE ATTACHED LOST BV</SectionLabel>
            <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.text }}>{formatCurrency(stats.totalLostBV)}</div>
         </Card>
         <Card id="loss-kpi-deals" style={{ position: 'relative' }}>
-           <ExportActions onDownload={() => handleExport('\1', '\2')} />
+           <ExportActions onDownload={() => handleExport('loss-kpi-deals', 'loss-kpi-deals.png')} />
            <SectionLabel>LOST DEALS (SE ATTACHED)</SectionLabel>
            <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.text }}>{stats.totalLostDeals.toLocaleString()}</div>
         </Card>
         <Card id="loss-kpi-age" style={{ position: 'relative' }}>
-           <ExportActions onDownload={() => handleExport('\1', '\2')} />
+           <ExportActions onDownload={() => handleExport('loss-kpi-age', 'loss-kpi-age.png')} />
            <SectionLabel>AVG AGE OF LOST DEALS</SectionLabel>
            <div style={{ fontSize: '36px', fontWeight: 700, color: COLORS.orange }}>{stats.avgAge}d</div>
         </Card>
@@ -1089,7 +1089,7 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
         <Card id="loss-reasons" style={{ position: 'relative', height: '400px' }}>
-           <ExportActions onDownload={() => handleExport('\1', '\2')} />
+           <ExportActions onDownload={() => handleExport('loss-reasons', 'loss-reasons.png')} />
            <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px' }}>Top Primary Loss Reasons</h2>
            {stats.reasons.length > 0 ? (
              <ResponsiveContainer width="100%" height={300}>
@@ -1113,7 +1113,7 @@ const LossAnalysisTab = ({ data, hasGlobalData, handleExport }) => {
       </div>
 
       <Card id="loss-deal-sizes" style={{ position: 'relative', height: '350px' }}>
-         <ExportActions onDownload={() => handleExport('\1', '\2')} />
+         <ExportActions onDownload={() => handleExport('loss-deal-sizes', 'loss-deal-sizes.png')} />
          <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px' }}>SE Attached Losses by Deal Size</h2>
          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={stats.dealSizes} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -1251,19 +1251,19 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
       {/* Section 2b — Deal-level LTV KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         <Card id="nri-se-ltv" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('nri-se-ltv', 'nri-se-ltv.png')} />
           <SectionLabel>SE AVG LTV</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: C.accent }}>{formatCurrency(stats.seAvgLtv)}</div>
           <div style={{ fontSize: '12px', color: C.textDim, marginTop: '4px' }}>n={stats.seCount.toLocaleString()} deals</div>
         </Card>
         <Card id="nri-nose-ltv" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('nri-nose-ltv', 'nri-nose-ltv.png')} />
           <SectionLabel>NO SE AVG LTV</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: C.textMuted }}>{formatCurrency(stats.noSeAvgLtv)}</div>
           <div style={{ fontSize: '12px', color: C.textDim, marginTop: '4px' }}>n={stats.noSeCount.toLocaleString()} deals</div>
         </Card>
         <Card id="nri-lift" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('nri-lift', 'nri-lift.png')} />
           <SectionLabel>LTV LIFT</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: liftColor }}>{stats.ltvLift >= 0 ? '+' : ''}{stats.ltvLift}%</div>
           <div style={{ fontSize: '12px', color: C.textDim, marginTop: '4px' }}>SE vs No-SE avg LTV</div>
@@ -1273,13 +1273,13 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
       {/* Section 2c — LTV/ACV Multiples */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
         <Card id="nri-se-mult" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('nri-se-mult', 'nri-se-mult.png')} />
           <SectionLabel>SE AVG LTV / ACV MULTIPLE</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: C.accent }}>{stats.seAvgMultiple}x</div>
           <div style={{ fontSize: '12px', color: C.textDim, marginTop: '4px' }}>lifetime value per dollar of initial ACV</div>
         </Card>
         <Card id="nri-nose-mult" style={{ position: 'relative' }}>
-          <ExportActions onDownload={() => handleExport('\1', '\2')} />
+          <ExportActions onDownload={() => handleExport('nri-nose-mult', 'nri-nose-mult.png')} />
           <SectionLabel>NO SE AVG LTV / ACV MULTIPLE</SectionLabel>
           <div style={{ fontSize: '36px', fontWeight: 700, color: C.textMuted }}>{stats.noSeAvgMultiple}x</div>
           <div style={{ fontSize: '12px', color: C.textDim, marginTop: '4px' }}>lifetime value per dollar of initial ACV</div>
@@ -1288,7 +1288,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
 
       {/* Section 3 — LTV Distribution */}
       <Card id="nrr-ltv-dist" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('nrr-ltv-dist', 'nrr-ltv-dist.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>LTV Distribution by Cohort</h2>
         <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>Account count by LTV band — SE-attached vs No SE</p>
         <div style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
@@ -1313,7 +1313,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
 
       {/* Section 3b — Avg LTV by ACV Band */}
       <Card id="nri-band-chart" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('nri-band-chart', 'nri-band-chart.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>Avg LTV by ACV Band</h2>
         <p style={{ fontSize: '12px', color: C.textMuted, marginBottom: '20px' }}>Closed Won deals with LTV &gt; 0 · SE renewal attribution applied</p>
         {stats.bandData.length > 0 ? (
@@ -1339,7 +1339,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
 
       {/* Section 4 — Regional Median LTV */}
       <Card id="nrr-region" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('nrr-region', 'nrr-region.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Regional Median LTV</h2>
         <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts only</p>
         <ResponsiveContainer width="100%" height={280}>
@@ -1360,7 +1360,7 @@ const NrrImpactTab = ({ nrrData, data, hasGlobalData, handleExport }) => {
 
       {/* Section 4b — Median LTV by Stage When SE Assigned */}
       <Card id="nrr-ltv-stage" style={{ position: 'relative' }}>
-        <ExportActions onDownload={() => handleExport('\1', '\2')} />
+        <ExportActions onDownload={() => handleExport('nrr-ltv-stage', 'nrr-ltv-stage.png')} />
         <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>Median LTV by Stage When SE Assigned</h2>
         <p style={{ fontSize: '12px', color: C.textMuted, margin: '0 0 16px 0' }}>SE-attached accounts — median LTV by genesis deal stage, sorted by value</p>
         <ResponsiveContainer width="100%" height={240}>
@@ -1761,26 +1761,26 @@ export default function App() {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
               <Card id="kpi-nb-card" accentColor={COLORS.blue} style={{ position: 'relative' }}>
-                <ExportActions onDownload={() => handleExport('\1', '\2')} />
+                <ExportActions onDownload={() => handleExport('kpi-nb-card', 'kpi-nb-card.png')} />
                 <SectionLabel>NEW BUSINESS</SectionLabel>
                 <div style={{ fontSize: '48px', fontWeight: 700, margin: '8px 0', color: COLORS.text }}>{formatCurrency(revKpis.nb)}</div>
                 <div style={{ fontSize: '16px', color: COLORS.textMuted }}>{revKpis.nbDeals.toLocaleString()} deals &middot; {revKpis.nbPct}% of total</div>
               </Card>
               <Card id="kpi-exp-card" accentColor={COLORS.green} style={{ position: 'relative' }}>
-                <ExportActions onDownload={() => handleExport('\1', '\2')} />
+                <ExportActions onDownload={() => handleExport('kpi-exp-card', 'kpi-exp-card.png')} />
                 <SectionLabel>EXPANSION</SectionLabel>
                 <div style={{ fontSize: '48px', fontWeight: 700, margin: '8px 0', color: COLORS.text }}>{formatCurrency(revKpis.expansion)}</div>
                 <div style={{ fontSize: '16px', color: COLORS.textMuted }}>Upsell {formatCurrency(revKpis.upsell)} &middot; Cross-Sell {formatCurrency(revKpis.crossSell)} &middot; {revKpis.expPct}% of total</div>
               </Card>
               <Card id="kpi-total-card" accentColor={COLORS.indigo} style={{ position: 'relative' }}>
-                <ExportActions onDownload={() => handleExport('\1', '\2')} />
+                <ExportActions onDownload={() => handleExport('kpi-total-card', 'kpi-total-card.png')} />
                 <SectionLabel>TOTAL SE BOOKINGS</SectionLabel>
                 <div style={{ fontSize: '48px', fontWeight: 700, margin: '8px 0', color: COLORS.text }}>{formatCurrency(revKpis.total)}</div>
                 <div style={{ fontSize: '16px', color: COLORS.textMuted }}>{revKpis.deals.toLocaleString()} total deals across all types</div>
               </Card>
             </div>
             <Card id="donut-chart-card" style={{ marginBottom: '24px', position: 'relative' }}>
-              <ExportActions onDownload={() => handleExport('\1', '\2')} />
+              <ExportActions onDownload={() => handleExport('donut-chart-card', 'donut-chart-card.png')} />
               <SectionLabel>SE Bookings by Product Type</SectionLabel>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '16px', minHeight: '280px' }}>
                 {donutData.data.length > 0 ? (
@@ -1823,7 +1823,7 @@ export default function App() {
               </div>
             </Card>
             <Card id="bar-chart-card" style={{ minHeight: '400px', position: 'relative' }}>
-              <ExportActions onDownload={() => handleExport('\1', '\2')} />
+              <ExportActions onDownload={() => handleExport('bar-chart-card', 'bar-chart-card.png')} />
               <SectionLabel>Monthly SE Bookings by Type & % of Total Revenue</SectionLabel>
               <div style={{ height: '400px', marginTop: '24px' }}>
                 {barData.length > 0 ? (
@@ -1844,7 +1844,7 @@ export default function App() {
               </div>
             </Card>
             <Card id="se-rev-segment" style={{ position: 'relative', height: '400px', marginTop: '24px' }}>
-              <ExportActions onDownload={() => handleExport('\1', '\2')} />
+              <ExportActions onDownload={() => handleExport('se-rev-segment', 'se-rev-segment.png')} />
               <h2 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '20px' }}>Average Revenue per SE by Segment</h2>
               <div style={{ height: '300px', marginTop: '16px' }}>
                 <ResponsiveContainer width="100%" height="100%">
