@@ -121,7 +121,17 @@ const PHRASE_DICTIONARY = [
   'ott platform', 'subscription model', 'pay per view',
   // Accessibility & interactivity
   'closed captions', 'auto captions', 'interactive video', 'in video search',
+  // AI & translation
+  'ai translation', 'ai translations', 'ait translation', 'ait translations',
 ];
+
+// Maps variant phrases to a single canonical display form
+const PHRASE_ALIASES = {
+  'ai translation':   'AI Translation',
+  'ai translations':  'AI Translation',
+  'ait translation':  'AI Translation',
+  'ait translations': 'AI Translation',
+};
 
 const ACRONYMS = new Set(['api', 'sso', 'ui', 'ux', 'qa', 'bi', 'db', 'ai', 'ip', 'it', 'tv', 'drm', 'hls', 'crm', 'lms', 'cms', 'pov', 'ott', 'saml', 'sdk', 'cdn', 'mfa', 'sla', 'roi']);
 
@@ -188,7 +198,8 @@ const extractKeywords = (text) => {
   const all = [...result];
   return all
     .filter(p => !all.some(o => o !== p && o.toLowerCase().includes(p.toLowerCase()) && o.split(' ').length > p.split(' ').length))
-    .filter(p => p.split(' ').length > 1 || p.toLowerCase() === 'demo');
+    .filter(p => p.split(' ').length > 1 || p.toLowerCase() === 'demo')
+    .map(p => PHRASE_ALIASES[p.toLowerCase()] ?? p);
 };
 
 // ─── STATIC FALLBACK DATA ──────────────────────────────────────────
