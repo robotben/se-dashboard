@@ -79,42 +79,116 @@ const STOP_WORDS = new Set([
   "purchasing", "purchased", "order", "orders", "ordered", "contract", "contracts", "agreement", "agreements", "sign", "signing", "signed", "close", "closing", "closed", "won", "lost",
   "fit", "content", "tech", "team", "teams", "technical", "technology",
   "http", "https", "www", "com", "org", "net", "io", "html", "htm", "co", "uk", "us",
-  "ott", "sfdc", "salesforce", "hubspot", "zoom", "microsoft", "google", "adobe", "slack"
+  "ott", "sfdc", "salesforce", "hubspot", "zoom", "microsoft", "google", "adobe", "slack",
+  // contraction fragments (apostrophe splits "don't" → "don" + "t")
+  "don", "won", "isn", "aren", "wasn", "hasn", "hadn", "couldn", "wouldn", "shouldn", "doesn", "didn", "shan", "mustn", "let",
+  // common words missing from base list
+  "time", "work", "works", "working", "worked", "now", "way", "ways", "day", "days", "week", "weeks", "year", "years", "month", "months",
+  "next", "last", "back", "away", "full", "free", "real", "able", "open", "part", "kind", "type", "main", "base", "best", "case",
+  "goal", "goals", "area", "areas", "plan", "plans", "role", "roles", "side", "line", "form", "hand", "name", "help", "show",
+  "find", "know", "keep", "move", "give", "take", "come", "look", "feel", "mean", "turn", "send", "able", "make", "made",
+  "more", "then", "than", "when", "also", "just", "very", "well", "even", "much", "with",
+  "something", "anything", "everything", "nothing", "someone", "anyone", "everyone",
+  "within", "across", "along", "around", "between", "through", "towards",
+  "able", "want", "needs", "things", "thing", "place", "point", "process",
+  "since", "interactive", "decide", "decided", "decides", "deciding", "decision",
 ]);
+
+const PHRASE_DICTIONARY = [
+  // Streaming & delivery
+  'live event', 'live streaming', 'live stream', 'live production', 'live broadcast', 'simulcast', 'multistream',
+  'adaptive streaming', 'hls streaming', 'video delivery',
+  // Player & embed
+  'custom player', 'player customization', 'player branding', 'embedded player', 'player sdk', 'white label', 'custom branding',
+  // Auth & access
+  'single sign on', 'sso saml', 'access control', 'password protection', 'domain restriction',
+  'privacy controls', 'token authentication', 'ip restriction', 'role based access',
+  // Analytics
+  'video analytics', 'viewer analytics', 'advanced analytics', 'viewer tracking', 'engagement analytics',
+  // Content management
+  'content library', 'video library', 'bulk upload', 'chapter markers', 'content management', 'folder structure',
+  // Integrations & API
+  'api integration', 'api access', 'sdk integration', 'cms integration', 'crm integration',
+  'lms integration', 'custom integration', 'webhook integration',
+  // Security
+  'drm protection', 'content protection', 'digital rights', 'enterprise security',
+  // Workflow & collaboration
+  'custom workflow', 'automated workflow', 'review approval', 'review and approval', 'team collaboration',
+  // Sales process
+  'proof of concept', 'competitive evaluation', 'technical evaluation', 'platform demo', 'technical demo',
+  'use case', 'migration plan',
+  // OTT & monetization
+  'ott platform', 'subscription model', 'pay per view',
+  // Accessibility & interactivity
+  'closed captions', 'auto captions', 'interactive video', 'in video search',
+];
+
+const ACRONYMS = new Set(['api', 'sso', 'ui', 'ux', 'qa', 'bi', 'db', 'ai', 'ip', 'it', 'tv', 'drm', 'hls', 'crm', 'lms', 'cms', 'pov', 'ott', 'saml', 'sdk', 'cdn', 'mfa', 'sla', 'roi']);
 
 const extractKeywords = (text) => {
   if (!text) return [];
   const cleaned = text.replace(/https?:\/\/\S+/gi, ' ').replace(/www\.\S+/gi, ' ');
-  const words = cleaned.toLowerCase().split(/[^a-z0-9]+/);
-  const uppercaseAcronyms = new Set(['api', 'sso', 'ui', 'ux', 'qa', 'bi', 'db', 'ai', 'ip', 'it', 'tv', 'drm']);
-  
-  // Filter and format unigrams
-  const validTokens = words.map(w => {
-    if (!w || STOP_WORDS.has(w) || !isNaN(w)) return null; 
-    if (w.length <= 2 && !uppercaseAcronyms.has(w)) return null; 
-    
-    if (uppercaseAcronyms.has(w)) {
-      return w.toUpperCase();
-    } else {
-      return w.charAt(0).toUpperCase() + w.slice(1);
-    }
-  });
+  const lowerText = cleaned.toLowerCase();
+  const tokens = lowerText.split(/[^a-z0-9]+/).filter(Boolean);
 
-  const keywords = [];
-  
-  // Push unigrams and build consecutive bigrams
-  for (let i = 0; i < validTokens.length; i++) {
-    if (validTokens[i]) {
-      keywords.push(validTokens[i]); // Unigram
-      
-      // Bigram
-      if (i + 1 < validTokens.length && validTokens[i + 1]) {
-        keywords.push(`${validTokens[i]} ${validTokens[i + 1]}`);
-      }
+  const fmt = w => ACRONYMS.has(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1);
+  const isValid = w => w && !STOP_WORDS.has(w) && isNaN(w) && (w.length > 3 || ACRONYMS.has(w));
+
+  // Returns index of the next valid token from `start`, allowing at most 1 intervening stop word
+  const nextValidIdx = (start) => {
+    let stopSkipped = 0;
+    for (let i = start; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (isValid(t)) return i;
+      if (STOP_WORDS.has(t) && stopSkipped < 1) { stopSkipped++; continue; }
+      return -1;
     }
+    return -1;
+  };
+
+  const result = new Set();
+
+  // Phase 1: curated phrase dictionary — exact word-boundary match
+  for (const phrase of PHRASE_DICTIONARY) {
+    const re = new RegExp('\\b' + phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    if (re.test(lowerText)) result.add(phrase.split(' ').map(fmt).join(' '));
   }
-  
-  return keywords;
+
+  // Phase 2: NLP — trigrams → bigrams → unigrams, longest match wins
+  const bigrams = new Set();
+  const trigrams = new Set();
+  const bigramWords = new Set();   // formatted words consumed by a bigram
+  const trigramBigrams = new Set(); // formatted bigrams consumed by a trigram
+
+  for (let i = 0; i < tokens.length; i++) {
+    if (!isValid(tokens[i])) continue;
+    const w0 = fmt(tokens[i]);
+
+    const j = nextValidIdx(i + 1);
+    if (j === -1) continue;
+    const w1 = fmt(tokens[j]);
+    const bigram = `${w0} ${w1}`;
+    bigrams.add(bigram);
+    bigramWords.add(w0);
+    bigramWords.add(w1);
+
+    const k = nextValidIdx(j + 1);
+    if (k === -1) continue;
+    const w2 = fmt(tokens[k]);
+    trigrams.add(`${w0} ${w1} ${w2}`);
+    trigramBigrams.add(bigram);
+  }
+
+  for (const tg of trigrams) result.add(tg);
+  for (const bg of bigrams) { if (!trigramBigrams.has(bg)) result.add(bg); }
+  for (const t of tokens) { if (isValid(t) && !bigramWords.has(fmt(t))) result.add(fmt(t)); }
+
+  // Sub-phrase suppression: drop any phrase that is a substring of a longer one
+  // Only return multi-word phrases; single words allowed only for "Demo"
+  const all = [...result];
+  return all
+    .filter(p => !all.some(o => o !== p && o.toLowerCase().includes(p.toLowerCase()) && o.split(' ').length > p.split(' ').length))
+    .filter(p => p.split(' ').length > 1 || p.toLowerCase() === 'demo');
 };
 
 // ─── STATIC FALLBACK DATA ──────────────────────────────────────────
