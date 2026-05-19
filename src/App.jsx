@@ -21,14 +21,14 @@ import {
 
 // Official Brand Colors
 const COLORS = {
-  bg:          "#0A0E12",
-  card:        "#141A20",
-  border:      "#28313A",
-  borderMuted: "#3D4751",
-  text:        "#FAFCFD",
+  bg:          "#141414",
+  card:        "#252930",
+  border:      "#3A3F48",
+  borderMuted: "#3A3F48",
+  text:        "#FFFFFF",
   textSub:     "#F1F5F9",
-  textMuted:   "#D1D9E1",
-  textDim:     "#3D4751",
+  textMuted:   "#8A8F99",
+  textDim:     "#8A8F99",
   blue:        "#17D5FF",
   blue60:      "#00AACF",
   blue80:      "#024655",
@@ -42,10 +42,10 @@ const COLORS = {
 };
 
 const V = {
-  black: "#0A0E12", pearlBlack: "#141A20", ebony: "#28313A", raven: "#3D4751",
-  white: "#FAFCFD", pearlWhite: "#F1F5F9", silver: "#DFE4EA", granite: "#D1D9E1",
+  black: "#141414", pearlBlack: "#252930", ebony: "#3A3F48", raven: "#8A8F99",
+  white: "#FFFFFF", pearlWhite: "#F1F5F9", silver: "#DFE4EA", granite: "#8A8F99",
   blue: "#17D5FF", blue60: "#00AACF", blue80: "#024655",
-  red40: "#FF5757", red60: "#BE2929",
+  red40: "#FE6363", red60: "#BE2929",
   orange40: "#FA9C58", orange60: "#D76614",
   green20: "#C1F698", green40: "#9AE85E", green60: "#619F32",
   indigo40: "#8C96F1", indigo60: "#404CAC",
@@ -61,8 +61,8 @@ const C = {
   red: V.red40, orange: V.orange40,
   indigo: V.indigo40,
   infoBackground: V.blue80, infoBorder: V.blue60, infoText: V.blue,
-  surface: V.pearlBlack, surfaceSecondary: V.black,
-  borderSecondary: V.raven, textSecondary: V.granite, textTertiary: V.raven,
+  surface: '#2E333B', surfaceSecondary: V.black,
+  borderSecondary: V.ebony, textSecondary: V.granite, textTertiary: V.raven,
 };
 
 // ─── NATURAL LANGUAGE PARSING ──────────────────────────────────────
@@ -209,6 +209,15 @@ const NRR_IMPACT_DATA = {
     { stage: 'Discovery',             medianLTV: 12800, n: 265 },
   ],
 };
+
+const WORKLOAD_WINRATE_DATA = [
+  { bucket: '1–5',   winRate: 38.4, n: 4 },
+  { bucket: '6–10',  winRate: 36.1, n: 6 },
+  { bucket: '11–20', winRate: 32.8, n: 7 },
+  { bucket: '21–30', winRate: 28.3, n: 5 },
+  { bucket: '31–50', winRate: 23.7, n: 3 },
+  { bucket: '51+',   winRate: 19.2, n: 1 },
+];
 
 // ─── UTILITIES ──────────────────────────────────────────────────────
 function linearRegression(points) {
@@ -358,7 +367,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 const TableRow = ({ row, index }) => {
   const [hover, setHover] = useState(false);
   const isLatam = row.region === 'LATAM';
-  let bg = index % 2 === 0 ? C.card : '#0D1118';
+  let bg = index % 2 === 0 ? C.card : '#1A1D21';
   if (isLatam && !hover) bg = 'rgba(158, 232, 94, 0.04)';
   if (hover) bg = V.ebony;
 
@@ -387,12 +396,14 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
       seCount: 26, aeWithSECount: 216, seDealsTotal: 3955, ratio: "10.8", coverage: 77, dealsPerSE: 152,
       totalWon: 35810, totalLost: 33562, seWon: 1253, seLost: 2674, seWonBV: 37280000,
       wonPct: 3.5, lostPct: 8.0, ratioLostToWon: 2.1,
+      seWinRate: 31.9,
       bucketData: [{ label: '$100K+', pct: 52.5, total: 1421 }, { label: '$50K–$100K', pct: 34.2, total: 3240 }, { label: '$25K–$50K', pct: 24.6, total: 6276 }, { label: '$10K–$25K', pct: 12.4, total: 8400 }, { label: '$0–$10K', pct: 6.3, total: 12036 }],
       tableData: [{ region: "AMER", aes: 154, ses: 19, deals: "2,564", won: 786, lost: "1,762", winPct: 31, noSeWinPct: "55%", bv: "$25.3M" }, { region: "EMEA", aes: 78, ses: 12, deals: "728", won: 224, lost: "497", winPct: 31, noSeWinPct: "50%", bv: "$6.6M" }, { region: "APAC/JAPAN", aes: 36, ses: 9, deals: "451", won: 149, lost: "299", winPct: 33, noSeWinPct: "47%", bv: "$3.1M" }, { region: "LATAM", aes: 8, ses: 9, deals: "100", won: 50, lost: "48", winPct: 50, noSeWinPct: "76%", bv: "$1.1M" }],
+      workloadData: WORKLOAD_WINRATE_DATA,
     };
 
     let totalWon = 0, totalLost = 0, seWon = 0, seLost = 0, seWonBV = 0;
-    const uniqueSEs = new Set(), uniqueAEs = new Set(), uniqueAEsWithSE = new Set(), regionMap = {};
+    const uniqueSEs = new Set(), uniqueAEs = new Set(), uniqueAEsWithSE = new Set(), regionMap = {}, seWorkloadMap = {};
     const buckets = [{ label: '$100K+', min: 100000, max: Infinity, total: 0, se: 0 }, { label: '$50K–$100K', min: 50000, max: 100000, total: 0, se: 0 }, { label: '$25K–$50K', min: 25000, max: 50000, total: 0, se: 0 }, { label: '$10K–$25K', min: 10000, max: 25000, total: 0, se: 0 }, { label: '$0–$10K', min: 0, max: 10000, total: 0, se: 0 }];
 
     data.forEach(d => {
@@ -404,7 +415,11 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
       if (isSE) { if (isWon) { seWon++; seWonBV += d.value; } else seLost++; }
       const bucket = buckets.find(b => d.value >= b.min && d.value < b.max);
       if (bucket) { bucket.total++; if (isSE) bucket.se++; }
-      
+      if (isSE && d.se && d.se !== "Unknown") {
+        if (!seWorkloadMap[d.se]) seWorkloadMap[d.se] = { won: 0, total: 0 };
+        seWorkloadMap[d.se].total++;
+        if (isWon) seWorkloadMap[d.se].won++;
+      }
       let r = d.region || "Unknown";
       const upper = r.toUpperCase();
       if (upper.includes("LATAM")) r = "LATAM"; else if (upper.includes("AMER") || upper === "US") r = "AMER"; else if (upper.includes("EMEA")) r = "EMEA"; else if (upper.includes("APAC")) r = "APAC/JAPAN";
@@ -414,17 +429,36 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
       else { if (isWon) regionMap[r].noSeWon++; else regionMap[r].noSeLost++; }
     });
 
+    const wlBuckets = [
+      { bucket: '1–5',   min: 1,  max: 5,        won: 0, total: 0, seCount: 0 },
+      { bucket: '6–10',  min: 6,  max: 10,       won: 0, total: 0, seCount: 0 },
+      { bucket: '11–20', min: 11, max: 20,       won: 0, total: 0, seCount: 0 },
+      { bucket: '21–30', min: 21, max: 30,       won: 0, total: 0, seCount: 0 },
+      { bucket: '31–50', min: 31, max: 50,       won: 0, total: 0, seCount: 0 },
+      { bucket: '51+',   min: 51, max: Infinity, won: 0, total: 0, seCount: 0 },
+    ];
+    Object.values(seWorkloadMap).forEach(se => {
+      const b = wlBuckets.find(b => se.total >= b.min && se.total <= b.max);
+      if (b) { b.won += se.won; b.total += se.total; b.seCount++; }
+    });
+    const computedWorkloadData = wlBuckets.filter(b => b.seCount > 0).map(b => ({
+      bucket: b.bucket, winRate: b.total > 0 ? Number((b.won / b.total * 100).toFixed(1)) : 0, n: b.seCount,
+    }));
+
+    const seWinRate = (seWon + seLost) > 0 ? Number((seWon / (seWon + seLost) * 100).toFixed(1)) : 0;
+
     return {
       seCount: uniqueSEs.size, aeWithSECount: uniqueAEsWithSE.size, seDealsTotal: seWon + seLost,
       ratio: uniqueSEs.size > 0 ? (uniqueAEsWithSE.size / uniqueSEs.size).toFixed(1) : "0.0",
       coverage: uniqueAEs.size > 0 ? Math.round((uniqueAEsWithSE.size / uniqueAEs.size) * 100) : 0,
       dealsPerSE: uniqueSEs.size > 0 ? Math.round((seWon+seLost) / uniqueSEs.size) : 0,
-      totalWon, totalLost, seWon, seLost, seWonBV,
+      totalWon, totalLost, seWon, seLost, seWonBV, seWinRate,
       wonPct: totalWon > 0 ? ((seWon / totalWon) * 100).toFixed(1) : "0.0",
       lostPct: totalLost > 0 ? ((seLost / totalLost) * 100).toFixed(1) : "0.0",
       ratioLostToWon: seWon > 0 ? (seLost / seWon).toFixed(1) : "0.0",
       bucketData: buckets.map(b => ({ label: b.label, total: b.total, pct: b.total > 0 ? Number(((b.se / b.total) * 100).toFixed(1)) : 0 })),
-      tableData: Object.values(regionMap).map(r => ({ region: r.region, aes: r.aes.size, ses: r.ses.size, deals: r.seDeals.toLocaleString(), won: r.seWon.toLocaleString(), lost: r.seLost.toLocaleString(), winPct: (r.seWon+r.seLost)>0 ? Math.round((r.seWon/(r.seWon+r.seLost))*100) : 0, noSeWinPct: (r.noSeWon+r.noSeLost)>0 ? `${Math.round((r.noSeWon/(r.noSeWon+r.noSeLost))*100)}%` : "0%", bv: formatCurrency(r.bv), rawDeals: r.seDeals })).sort((a,b) => b.rawDeals - a.rawDeals)
+      tableData: Object.values(regionMap).map(r => ({ region: r.region, aes: r.aes.size, ses: r.ses.size, deals: r.seDeals.toLocaleString(), won: r.seWon.toLocaleString(), lost: r.seLost.toLocaleString(), winPct: (r.seWon+r.seLost)>0 ? Math.round((r.seWon/(r.seWon+r.seLost))*100) : 0, noSeWinPct: (r.noSeWon+r.noSeLost)>0 ? `${Math.round((r.noSeWon/(r.noSeWon+r.noSeLost))*100)}%` : "0%", bv: formatCurrency(r.bv), rawDeals: r.seDeals })).sort((a,b) => b.rawDeals - a.rawDeals),
+      workloadData: computedWorkloadData.length > 0 ? computedWorkloadData : WORKLOAD_WINRATE_DATA,
     };
   }, [data, hasGlobalData]);
 
@@ -520,12 +554,38 @@ const AttachmentRateDashboard = ({ data, dateRange, hasGlobalData, handleExport 
           <tbody>{stats.tableData.map((r, i) => <TableRow key={i} row={r} index={i} />)}</tbody>
         </table>
       </div>
+
+      <div id="attachment-workload-card" style={{ position: 'relative', background: C.card, borderTop: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, borderLeft: `1px solid ${C.border}`, borderRadius: '8px', padding: '24px' }}>
+        <ExportActions onDownload={() => handleExport('attachment-workload-card', 'attachment-workload-card.png')} />
+        <InfoPanel label="Win Rate by SE Workload" as="h2" labelStyle={{ margin: 0, fontSize: '18px', fontWeight: 700, color: C.text }} wrapStyle={{ marginBottom: '4px' }} calc="SE-attached deals grouped by the total number of closed deals assigned to that SE in the dataset. Win rate is aggregated across all SEs in each workload bucket (sum of wins ÷ sum of total deals)." why="Reveals whether overloaded SEs close fewer deals. A declining trend suggests SE capacity constraints are impacting performance." caveat="Workload is measured as total closed deals in the selected date window, not concurrent open pipeline. SEs with very few deals (1–5) may be new hires or part-time contributors." />
+        <p style={{ fontSize: '12px', color: C.textMuted, margin: '4px 0 20px 0' }}>Each point aggregates all SEs in that workload range — hover for SE count</p>
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={stats.workloadData} margin={{ top: 8, right: 24, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <XAxis dataKey="bucket" fontSize={11} tick={{ fill: C.textMuted }} label={{ value: 'Deals assigned to SE', position: 'insideBottom', offset: -2, fontSize: 10, fill: C.textMuted }} height={40} />
+            <YAxis fontSize={11} tick={{ fill: C.textMuted }} tickFormatter={v => `${v}%`} domain={[0, 'auto']} />
+            <Tooltip content={({ active, payload, label }) => {
+              if (!active || !payload?.length) return null;
+              const d = payload[0].payload;
+              return (
+                <div style={{ background: V.pearlBlack, border: `1px solid ${C.border}`, borderRadius: '6px', padding: '10px 14px', fontSize: '12px' }}>
+                  <div style={{ color: C.textMuted, marginBottom: '4px' }}>{label} deals</div>
+                  <div style={{ color: C.accent, fontWeight: 700 }}>{d.winRate}% win rate</div>
+                  <div style={{ color: C.textMuted, marginTop: '2px' }}>{d.n} SE{d.n !== 1 ? 's' : ''} in this range</div>
+                </div>
+              );
+            }} />
+            <ReferenceLine y={stats.seWinRate} stroke={C.textMuted} strokeDasharray="5 3" label={{ value: `Avg ${stats.seWinRate}%`, position: 'insideTopRight', fontSize: 10, fill: C.textMuted }} />
+            <Line dataKey="winRate" name="Win Rate" stroke={C.accent} strokeWidth={2.5} dot={{ r: 5, fill: C.accent, strokeWidth: 0 }} activeDot={{ r: 7 }} connectNulls />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };
 
 const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
-  const sharedCardStyle = { backgroundColor: '#151a20', borderTop: '1px solid rgba(23, 213, 255, 0.35)', borderRight: '1px solid rgba(23, 213, 255, 0.35)', borderBottom: '1px solid rgba(23, 213, 255, 0.35)', borderLeft: '1px solid rgba(23, 213, 255, 0.35)', borderRadius: '12px', padding: '20px' };
+  const sharedCardStyle = { backgroundColor: '#252930', borderTop: '1px solid rgba(23, 213, 255, 0.35)', borderRight: '1px solid rgba(23, 213, 255, 0.35)', borderBottom: '1px solid rgba(23, 213, 255, 0.35)', borderLeft: '1px solid rgba(23, 213, 255, 0.35)', borderRadius: '12px', padding: '20px' };
 
   const winStats = useMemo(() => {
     if (!hasGlobalData) return {
@@ -616,7 +676,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
   }, [winStats.heatmap]);
 
   const [hoveredHeat, setHoveredHeat] = useState(null);
-  const getHeatColor = (v) => v === null ? 'transparent' : (v<=20?'#7B1F1F':v<=29?'#8B4A1A':v<=36?'#5A6B1A':v<=43?'#1A5C2A':'#0D3D1A');
+  const getHeatColor = (v) => v === null ? 'transparent' : (v<=20?'rgba(254,99,99,0.4)':v<=29?'rgba(250,156,88,0.4)':v<=36?'rgba(154,232,94,0.3)':v<=43?'rgba(154,232,94,0.55)':'rgba(23,213,255,0.35)');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -635,7 +695,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
         </Card>
         <Card id="win-nose" style={{ position: 'relative' }}>
           <InfoPanel label="NO SE WIN RATE" labelStyle={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: C.textDim, fontWeight: 600 }} wrapStyle={{ marginBottom: '8px' }} calc="Won deals ÷ (Won + Lost deals) where Has Solutions Engineer = No, for deals ≥ $10K ACV." why="Baseline win rate for deals without SE to benchmark SE impact." />
-          <div style={{ fontSize: '28px', fontWeight: 700, color: '#C8D6E5', marginTop: '8px' }}>{winStats.kpis.overall.noSe}%</div>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: COLORS.textSub, marginTop: '8px' }}>{winStats.kpis.overall.noSe}%</div>
         </Card>
         <Card id="win-lift" style={{ position: 'relative' }}>
           <InfoPanel label="NB LIFT" labelStyle={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: C.textDim, fontWeight: 600 }} wrapStyle={{ marginBottom: '8px' }} calc="SE New Business Win Rate − No-SE New Business Win Rate (in percentage points)." why="Positive lift means SE improves NB win rates; negative means SE is deployed on harder-than-average deals." caveat="SE is often assigned to the most competitive deals, so negative lift is expected and does not indicate poor performance." />
@@ -699,7 +759,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
               <thead><tr><th />{['MID', 'LARGE', 'ENT'].map(h => <th key={h} style={{ fontSize: '10px', color: COLORS.textDim }}>{h}</th>)}</tr></thead>
               <tbody>{winStats.heatmap.map((r, i) => (
                 <tr key={i}>
-                  <td style={{ fontSize: '12px', color: '#C8D6E5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '140px' }} title={r.activity}>{r.activity}</td>
+                  <td style={{ fontSize: '12px', color: COLORS.textSub, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '140px' }} title={r.activity}>{r.activity}</td>
                   {['mid', 'large', 'enterprise'].map(k => {
                     const nKey = k === 'mid' ? 'midN' : k === 'large' ? 'largeN' : 'enterpriseN';
                     const isHovered = hoveredHeat && hoveredHeat.row === i && hoveredHeat.col === k;
@@ -737,7 +797,7 @@ const WinRateTab = ({ data, dateRange, hasGlobalData, handleExport }) => {
             {winStats.keywords.length > 0 ? (
               <BarChart data={winStats.keywords} layout="vertical">
                 <XAxis type="number" hide />
-                <YAxis type="category" dataKey="term" width={100} fontSize={12} tick={{ fill: '#C8D6E5' }} />
+                <YAxis type="category" dataKey="term" width={100} fontSize={12} tick={{ fill: COLORS.textSub }} />
                 <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} content={<CustomTooltip />} />
                 <Bar dataKey="count" radius={[0, 4, 4, 0]}>{winStats.keywords.map((e, i) => <Cell key={i} fill={e.category === 'technical' ? COLORS.blue : COLORS.orange} />)}<LabelList dataKey="count" position="right" fill="#3D4751" fontSize={10} /></Bar>
               </BarChart>
@@ -818,7 +878,7 @@ const PovImpactTab = ({ data, hasGlobalData, handleExport }) => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
           {stats.bands.map((b, i) => (
             <div key={i} style={{ background: COLORS.bg, borderTop: `1px solid ${b.recColor}`, borderRight: `1px solid ${b.recColor}`, borderBottom: `1px solid ${b.recColor}`, borderLeft: `1px solid ${b.recColor}`, borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#C8D6E5', marginBottom: '12px' }}>{b.label}</div>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: COLORS.textSub, marginBottom: '12px' }}>{b.label}</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <div><div style={{ fontSize: '9px', color: COLORS.textDim }}>{stats.mode.toUpperCase()}</div><div style={{ fontSize: '20px', fontWeight: 700, color: b.recColor }}>{b.rate}%</div></div>
                 <div style={{ textAlign: 'right' }}><div style={{ fontSize: '9px', color: COLORS.textDim }}>NO {stats.mode.toUpperCase()}</div><div style={{ fontSize: '20px', fontWeight: 700, color: '#FAFCFD' }}>{b.noPovRate}%</div></div>
@@ -974,7 +1034,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
             <tbody>
               {stats.matrix.map((r, i) => (
                 <tr key={i}>
-                  <td style={{ fontSize: '11px', color: '#C8D6E5', fontWeight: 600, whiteSpace: 'nowrap' }}>{r.size}</td>
+                  <td style={{ fontSize: '11px', color: COLORS.textSub, fontWeight: 600, whiteSpace: 'nowrap' }}>{r.size}</td>
                   {['low', 'medium', 'high'].map(k => (
                     <td key={k} style={{ textAlign: 'center', width: '28%' }}>
                       <div style={{ height: '36px', background: getHeatColor(r[k], k), borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: r[k] !== null ? '#FAFCFD' : 'transparent', fontSize: '13px' }}>
@@ -1005,7 +1065,7 @@ const TechnicalFitTab = ({ data, hasGlobalData, handleExport }) => {
           <tbody>
             {stats.ageMatrix.map((r, i) => (
               <tr key={i}>
-                <td style={{ fontSize: '11px', color: '#C8D6E5', fontWeight: 600, whiteSpace: 'nowrap' }}>{r.size}</td>
+                <td style={{ fontSize: '11px', color: COLORS.textSub, fontWeight: 600, whiteSpace: 'nowrap' }}>{r.size}</td>
                 {['low', 'medium', 'high'].map(k => {
                   const maxAge = Math.max(...stats.ageMatrix.flatMap(m => [m.high, m.medium, m.low].filter(v => v !== null)), 1);
                   const val = r[k];
@@ -1764,7 +1824,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: 'Inter Tight, sans-serif', backgroundColor: COLORS.bg, color: COLORS.text, minHeight: '100vh', paddingBottom: '60px' }}>
-      <div style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'rgba(10, 14, 18, 0.9)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${COLORS.border}` }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'rgba(20, 20, 20, 0.9)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${COLORS.border}` }}>
         <div style={{ padding: '16px 32px 8px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <label style={{ cursor: 'pointer', backgroundColor: COLORS.blue, color: '#000', padding: '8px 16px', borderTop: 'none', borderRight: 'none', borderBottom: 'none', borderLeft: 'none', borderRadius: '6px', fontWeight: 700 }}>
